@@ -277,12 +277,14 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_R)) {
-			player.posX = world.random.nextDouble(-1000.0, 1000.0);
-			player.posY = 64.0;
-			player.posZ = world.random.nextDouble(-1000.0, 1000.0);
-			player.velX = 0.0;
+			//player.posX = world.random.nextDouble(-1000.0, 1000.0);
+			//player.posY = 64.0;
+		//	player.posZ = world.random.nextDouble(-1000.0, 1000.0);
+			double a = Math.cos((Math.PI/180) * player.rotYaw) * 100000;
+			double b = Math.sin((Math.PI/180) * player.rotYaw) * 100000;
+			player.velX = a;
 			player.velY = 0.0;
-			player.velZ = 0.0;
+			player.velZ = b;
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.0f) {

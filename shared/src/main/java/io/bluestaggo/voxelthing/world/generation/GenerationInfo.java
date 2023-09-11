@@ -19,6 +19,8 @@ public class GenerationInfo {
 	private final long cliffHeightSeed;
 	private final long caveSeed;
 
+	public final float offset = 31415926f;
+
 	private final float[] height = new float[Chunk.AREA];
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];
 	private int lastQueryLayer = Integer.MAX_VALUE;
@@ -64,20 +66,22 @@ public class GenerationInfo {
 		final float cliffHeightMin = 2.0f;
 		final float cliffHeightMax = 8.0f;
 
+
+
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				int xx = (chunkX * Chunk.LENGTH + x);
 				int zz = (chunkZ * Chunk.LENGTH + z);
 
-				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, xx / baseScale, zz / baseScale);
-				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, xx / hillScale, zz / hillScale);
+				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, (xx + offset) / baseScale, (zz + offset) / baseScale);
+				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, (xx + offset) / hillScale, (zz + offset) / hillScale);
 				hill = 1.0f - (float) Math.cos(MathUtil.threshold(hill, hillThresholdMin, hillThresholdMax) * MathUtil.PI_F / 2.0f);
 
 				float addedBaseHeight = baseHeightScale * MathUtil.lerp(1.0f, hillHeightScaleMod, hill);
 				baseHeight = baseHeight * addedBaseHeight + hill * hillHeightScale;
 
-				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, xx / cliffScale, zz / cliffScale);
-				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, xx / cliffHeightScale, zz / cliffHeightScale);
+				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, (xx + offset) / cliffScale, (zz + offset) / cliffScale);
+				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, (xx + offset) / cliffHeightScale, (zz + offset) / cliffHeightScale);
 				cliffHeight = MathUtil.lerp(cliffHeightMin, cliffHeightMax, cliffHeight / 2.0f + 0.5f) * (1.0f - hill * 5.0f);
 
 				if (cliff > cliffThreshold) {
@@ -142,7 +146,7 @@ public class GenerationInfo {
 					int yy = (y << 2) + (layer << Chunk.SIZE_POW2);
 					int zz = (z << 2) + (chunkZ << Chunk.SIZE_POW2);
 
-					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
+					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, (xx + (int)offset) / cheeseScaleXZ, (yy + (int)offset) / cheeseScaleY, (zz + (int)offset) / cheeseScaleXZ);
 					caveInfo[MathUtil.index3D(x, y, z, LERP_MAP_LENGTH)] = cheese;
 				}
 			}

@@ -61,7 +61,7 @@ public class BlockInventory extends GuiScreen {
 
 				r.draw2D.drawQuad(hotbarQuad.at(slotX, slotY));
 
-				int i = x + y * ROWS + 1;
+				int i = x + y * ROWS;
 				if (i < Block.REGISTERED_BLOCKS_ORDERED.size()) {
 					Block block = Block.REGISTERED_BLOCKS_ORDERED.get(i);
 					if (block != null) {
@@ -120,7 +120,7 @@ public class BlockInventory extends GuiScreen {
 
 				if (mx > slotX + blockOffX && mx < slotX + slotWidth - blockOffX
 						&& my > slotY + blockOffY && my < slotY + slotHeight - blockOffY) {
-					int i = x + y * ROWS + 1;
+					int i = x + y * ROWS;
 					Block block = i < Block.REGISTERED_BLOCKS_ORDERED.size() ? Block.REGISTERED_BLOCKS_ORDERED.get(i) : null;
 					game.palette[game.heldItem] = block;
 				}

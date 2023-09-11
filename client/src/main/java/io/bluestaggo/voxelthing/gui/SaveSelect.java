@@ -9,9 +9,15 @@ import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+
 public class SaveSelect extends GuiScreen {
 	private final GuiControl newWorldButton;
 	private final GuiControl playWorldButton;
+	private ArrayList<GuiControl> saveButtons = new ArrayList<GuiControl>();
+	private String[] directories;
 
 	public SaveSelect(Game game) {
 		super(game);
@@ -22,12 +28,37 @@ public class SaveSelect extends GuiScreen {
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 1.0f)
 		);
+		
 		playWorldButton = addControl(new LabeledButton(this)
 				.withText("Play Saved World")
-				.at(-50.0f, -10.0f)
+				.at(-50.0f, -120.0f)
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 0.5f)
 		);
+
+
+		String path = game.saveDir.toString() + "\\worlds";
+ 
+        File file = new File(path);
+    	directories = file.list(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+				File file = new File(dir, name);
+				if (file.isDirectory() && new File(file.getPath(),"player.dat").exists()) {
+               	 return new File(dir, name).isDirectory();
+				}
+				return false;
+            }
+        });
+ 
+        for (int i = 0; i < directories.length; i++) {
+			GuiControl a = addControl(new LabeledButton(this).withText(directories[i]).at(-50,0 + 22 * i).alignedAt(0.5f, 0.18f).size(100,20));
+			
+			saveButtons.add(a);	
+		}
+
+
+		
 	}
 
 	@Override
@@ -57,6 +88,12 @@ public class SaveSelect extends GuiScreen {
 		if (control == playWorldButton) {
 			game.startWorld("world");
 			game.openGui(null);
+		}
+		for (int i = 0; i < saveButtons.size(); i++) {
+			if (control == saveButtons.get(i)) {
+				game.startWorld(directories[i]);
+				game.openGui(null);
+			}
 		}
 	}
 }
