@@ -280,8 +280,8 @@ public class Game {
 			//player.posX = world.random.nextDouble(-1000.0, 1000.0);
 			//player.posY = 64.0;
 		//	player.posZ = world.random.nextDouble(-1000.0, 1000.0);
-			double a = Math.cos((Math.PI/180) * player.rotYaw) * 100000;
-			double b = Math.sin((Math.PI/180) * player.rotYaw) * 100000;
+			double a = Math.cos((Math.PI/180) * player.rotYaw) * 100;
+			double b = Math.sin((Math.PI/180) * player.rotYaw) * 100;
 			player.velX = a;
 			player.velY = 0.0;
 			player.velZ = b;
@@ -317,6 +317,7 @@ public class Game {
 
 		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
 			window.toggleGrabCursor();
+			openGui(new PauseMenu(this));
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {

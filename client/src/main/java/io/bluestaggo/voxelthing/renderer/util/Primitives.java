@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.util.Vector3fPrimitives;
 
 public abstract class Primitives {
 	private static Primitives world;

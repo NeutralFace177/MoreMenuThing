@@ -19,7 +19,7 @@ public class GenerationInfo {
 	private final long cliffHeightSeed;
 	private final long caveSeed;
 
-	public final float offset = 31415926f;
+	public final float offset = -9/11f;
 
 	private final float[] height = new float[Chunk.AREA];
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];

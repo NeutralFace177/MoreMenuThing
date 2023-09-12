@@ -8,6 +8,7 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.glfw.GLFW.*;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 
 public class SaveSelect extends GuiScreen {
 	private final GuiControl newWorldButton;
-	private final GuiControl playWorldButton;
 	private ArrayList<GuiControl> saveButtons = new ArrayList<GuiControl>();
 	private String[] directories;
 
@@ -29,12 +29,6 @@ public class SaveSelect extends GuiScreen {
 				.alignedAt(0.5f, 1.0f)
 		);
 		
-		playWorldButton = addControl(new LabeledButton(this)
-				.withText("Play Saved World")
-				.at(-50.0f, -120.0f)
-				.size(100.0f, 20.0f)
-				.alignedAt(0.5f, 0.5f)
-		);
 
 
 		String path = game.saveDir.toString() + "\\worlds";
@@ -78,15 +72,12 @@ public class SaveSelect extends GuiScreen {
 		super.draw();
 	}
 
+	
+
 	@Override
 	public void onControlClicked(GuiControl control, int button) {
 		if (control == newWorldButton) {
 			game.startWorld();
-			game.openGui(null);
-		}
-
-		if (control == playWorldButton) {
-			game.startWorld("world");
 			game.openGui(null);
 		}
 		for (int i = 0; i < saveButtons.size(); i++) {
