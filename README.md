@@ -1,3 +1,11 @@
+##TODO:
+•Add legitimate options
+•Add scrolling to save menu
+
+
+
+
+
 ![VOXEL THING](doc/logo.png)
 ## Your generic barebones clone of a really popular block game
 Nothing much here yet, huh? What will this be? Well, it is heading towards being some sort of standalone version of [Diverge](https://github.com/BlueStaggo/MCDiverge), a mod created by the same author as this random, uhh, voxel thing. This game might feature furry content, like how [DangerZone](https://orespawn.com) has anti-vax content, who knows? Voxel Thing will feature multiplayer and it will be free to play if it turns into a full on game.
