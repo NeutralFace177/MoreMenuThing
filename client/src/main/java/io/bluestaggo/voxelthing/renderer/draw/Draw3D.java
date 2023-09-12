@@ -2,7 +2,6 @@ package io.bluestaggo.voxelthing.renderer.draw;
 
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.shader.BillboardShader;
-import io.bluestaggo.voxelthing.renderer.shader.CloudShader;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
 import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
@@ -17,14 +16,12 @@ public class Draw3D {
 	private final Bindings clouds = new Bindings(VertexType.VECTOR3F);
 
 	private final BillboardShader billboardShader;
-	private final CloudShader cloudShader;
 
 	public Draw3D(MainRenderer renderer) {
 		this.renderer = renderer;
 
 		try {
 			billboardShader = new BillboardShader();
-			cloudShader = new CloudShader();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -35,6 +32,7 @@ public class Draw3D {
 		billboard.addVertices(0.0f, 1.0f, 0.0f);
 		billboard.addIndices(0, 1, 2, 2, 3, 0);
 		billboard.upload(false);
+
 		clouds.addVertices(1.0f, 0.0f, 1.0f);
 		clouds.addVertices(1.0f, 0.0f, 0.0f);
 		clouds.addVertices(0.0f, 0.0f, 0.0f);
@@ -65,23 +63,6 @@ public class Draw3D {
 		this.billboard.draw();
 	}
 
-	public void drawClouds(double ticks) {
-		cloudShader.use();
-		cloudShader.proj.set(renderer.camera.getProj());
-		cloudShader.view.set(renderer.camera.getView());
-		cloudShader.camPos.set(renderer.camera.getPosition());
-		cloudShader.ticks.set((float)ticks);
-		double distance = renderer.camera.getFar()/32;
-		if(distance <= 4) {
-			cloudShader.fogMultiplier.set(12.0F);
-		} else if(distance == 8) {
-			cloudShader.fogMultiplier.set(4.5F);
-		} else {
-			cloudShader.fogMultiplier.set(2.0F);
-		}
-		renderer.textures.getMipmappedTexture("/assets/environment/clouds.png").use();
-		this.clouds.draw();
-	}
 
 	public void unload() {
 		bindings.unload();

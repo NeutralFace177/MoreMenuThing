@@ -12,6 +12,7 @@ import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.Camera;
 import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
+import io.bluestaggo.voxelthing.window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -30,6 +31,7 @@ public class MainRenderer {
 
 	public final WorldShader worldShader;
 	public final SkyShader skyShader;
+	public final CloudShader cloudShader;
 	public final ScreenShader screenShader;
 
 	public final Draw3D draw3D;
@@ -58,6 +60,7 @@ public class MainRenderer {
 
 			worldShader = new WorldShader();
 			skyShader = new SkyShader();
+			cloudShader = new CloudShader();
 			screenShader = new ScreenShader();
 
 			draw3D = new Draw3D(this);
@@ -106,18 +109,17 @@ public class MainRenderer {
 			glCullFace(GL_FRONT);
 
 			setupSkyShader(view, proj);
-			Texture.stop();
+			setupCloudShader(viewProj);
 			skyFramebuffer.use();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			worldRenderer.drawSky();
+			drawSkybox();
 			Framebuffer.stop();
-			worldRenderer.drawSky();
+			drawSkybox();
 
 			setupWorldShader(viewProj);
 			textures.getMipmappedTexture("/assets/blocks.png").use();
 			useSkyTexture(1);
 			worldRenderer.draw();
-			worldRenderer.drawClouds(game.getTickCount());
 
 			state.disable(GL_CULL_FACE);
 
@@ -139,6 +141,14 @@ public class MainRenderer {
 		screenShader.mvp.set(screen.getViewProj());
 	}
 
+	private void drawSkybox() {
+		Texture.stop();
+		worldRenderer.drawSky();
+		textures.getMipmappedTexture("/assets/environment/clouds.png").use();
+		worldRenderer.drawClouds();
+		Texture.stop();
+	}
+
 	private void setupWorldShader(Matrix4f viewProj) {
 		worldShader.use();
 		worldShader.mvp.set(viewProj);
@@ -151,6 +161,14 @@ public class MainRenderer {
 		skyShader.proj.set(proj);
 		skyShader.fogCol.set(fogColor);
 		skyShader.skyCol.set(skyColor);
+	}
+
+	private void setupCloudShader(Matrix4f viewPoj) {
+		cloudShader.use();
+		cloudShader.viewProj.set(viewPoj);
+		cloudShader.camPos.set(camera.getPosition());
+		cloudShader.camFar.set(camera.getFar());
+		cloudShader.ticks.set((float) Window.getTimeElapsed());
 	}
 
 	public void setupFogShader(BaseFogShader shader) {

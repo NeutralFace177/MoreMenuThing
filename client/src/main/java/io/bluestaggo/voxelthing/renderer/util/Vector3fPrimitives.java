@@ -1,12 +1,12 @@
 package io.bluestaggo.voxelthing.renderer.util;
 
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
-import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
 
-public class WorldPrimitives extends Primitives {
+public class Vector3fPrimitives extends Primitives {
 	@Override
 	protected Bindings newBindings() {
-		return new Bindings(VertexLayout.WORLD);
+		return new Bindings(VertexType.VECTOR3F);
 	}
 
 	@Override
@@ -16,11 +16,9 @@ public class WorldPrimitives extends Primitives {
 
 	@Override
 	protected void addColor(Bindings bindings, float r, float g, float b) {
-		bindings.addVertices(r, g, b);
 	}
 
 	@Override
 	protected void addUv(Bindings bindings, float u, float v) {
-		bindings.addVertices(u, v);
 	}
 }

@@ -26,7 +26,11 @@ Nothing much here yet, huh? What will this be? Well, it is heading towards being
 - [: Decrease GUI scale
 
 ## Play
-To play Voxel Thing, download a jar from [the latest release](https://github.com/BlueStaggo/VoxelThing/releases/latest) for your platform. From there, it is as simple as running the jar. Java 17 or later is required to run Voxel Thing.
+There are two ways to play Voxel Thing:
+- Download [the latest release](https://github.com/BlueStaggo/VoxelThing/releases/latest) for your platform.
+- Get the latest cross-platform artifact from the latest commit [here](https://github.com/BlueStaggo/VoxelThing/actions).
+
+From there, it is as simple as running the jar! Java 17 or later is required to run Voxel Thing.
 
 ## Compiling
 To compile the Voxel Thing client, simply run `./gradlew :client:build`. To create a jar with libraries for your current platform, run `./gradlew :client:shadowJar`. To switch to a different platform, change the `voxelthing.client.platform` option in [gradle.properties](/gradle.properties) to any platform that LWJGL supports or set it to `all` to allow all platforms in a single jar.

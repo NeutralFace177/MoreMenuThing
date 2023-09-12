@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing.renderer.world;
 
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
-import io.bluestaggo.voxelthing.renderer.util.WorldPrimitives;
+import io.bluestaggo.voxelthing.renderer.util.Primitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
 import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.Chunk;
@@ -18,6 +18,7 @@ import static org.lwjgl.opengl.GL33C.*;
 public class WorldRenderer {
 	private final MainRenderer renderer;
 	private final Bindings background;
+	private final Bindings clouds;
 
 	private World world;
 	private ChunkRenderer[] chunkRenderers;
@@ -31,7 +32,8 @@ public class WorldRenderer {
 	public WorldRenderer(MainRenderer renderer) {
 		this.renderer = renderer;
 
-		background = WorldPrimitives.generateSphere(null, 1.0f, 16, 16);
+		background = Primitives.inWorld().generateSphere(null, 1.0f, 16, 16);
+		clouds = Primitives.ofVector3f().generatePlane(null);
 	}
 
 	public int chunkRendererCoord(int x, int y, int z) {
@@ -97,6 +99,7 @@ public class WorldRenderer {
 
 	public void drawSky() {
 		try (GLState state = new GLState()) {
+			renderer.skyShader.use();
 			state.disable(GL_DEPTH_TEST);
 			glCullFace(GL_FRONT);
 			background.draw();
@@ -104,13 +107,12 @@ public class WorldRenderer {
 		}
 	}
 
-	public void drawClouds(double ticks) {
+	public void drawClouds() {
 		try (GLState state = new GLState()) {
+			renderer.cloudShader.use();
 			state.enable(GL_BLEND);
 			state.disable(GL_CULL_FACE);
-			renderer.draw3D.drawClouds(ticks);
-			state.enable(GL_CULL_FACE);
-			state.disable(GL_BLEND);
+			clouds.draw();
 		}
 	}
 

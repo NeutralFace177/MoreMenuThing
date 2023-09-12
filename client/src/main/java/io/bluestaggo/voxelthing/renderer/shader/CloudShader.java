@@ -8,24 +8,26 @@ import org.joml.Vector4f;
 import java.io.IOException;
 
 public class CloudShader extends Shader {
-    public final ShaderUniform<Matrix4f> view;
-    public final ShaderUniform<Matrix4f> proj;
+    public final ShaderUniform<Matrix4f> viewProj;
     public final ShaderUniform<Vector3f> camPos;
     public final ShaderUniform<Vector4f> uvRange;
     public final ShaderUniform<Float> ticks;
+    public final ShaderUniform<Float> cloudHeight;
+
     public final ShaderUniform<Integer> tex;
-    public final ShaderUniform<Float> fogMultiplier;
+    public final ShaderUniform<Float> camFar;
 
     public CloudShader() throws IOException {
         super("/assets/shaders/cloud");
         use();
-        view = getUniformMatrix4fv("view");
-        proj = getUniformMatrix4fv("proj");
-        (uvRange = getUniform4f("uvRange")).set(new Vector4f(0.0F,0.0F,64F/256F,64F/256F));
-        ticks = getUniform1f("ticks");
-        (tex = getUniform1i("tex")).set(0);
+        viewProj = getUniformMatrix4fv("viewProj");
         camPos = getUniform3f("camPos");
-        fogMultiplier = getUniform1f("fogMultiplier");
+        (uvRange = getUniform4f("uvRange")).set(new Vector4f(0.0f, 0.0f, 0.25f, 0.25f));
+        ticks = getUniform1f("ticks");
+        cloudHeight = getUniform1f("cloudHeight");
+
+        (tex = getUniform1i("tex")).set(0);
+        camFar = getUniform1f("camFar");
         stop();
     }
 }

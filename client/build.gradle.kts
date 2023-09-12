@@ -79,6 +79,10 @@ application {
     mainClass.set("io.bluestaggo.voxelthing.Game")
 }
 
+tasks.shadowJar {
+    archiveFileName.set("voxelthing-${platform}.jar")
+}
+
 tasks.compileJava {
     dependsOn("genMetadata")
 }
