@@ -14,6 +14,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 
+import org.lwjgl.glfw.GLFWScrollCallback;
+import org.lwjgl.glfw.GLFWScrollCallbackI;
+
 public class SaveSelect extends GuiScreen {
 	private final GuiControl newWorldButton;
 	private ArrayList<GuiControl> saveButtons = new ArrayList<GuiControl>();
@@ -51,8 +54,6 @@ public class SaveSelect extends GuiScreen {
 			saveButtons.add(a);	
 		}
 
-
-		
 	}
 
 	@Override
@@ -69,6 +70,30 @@ public class SaveSelect extends GuiScreen {
 			r.fonts.outlined.printCentered("SELECT WORLD", r.screen.getWidth() / 2.0f, 10.0f);
 		}
 
+		GLFWScrollCallbackI mouseScrollCallback; 
+		glfwSetScrollCallback(game.window.getHandle(), mouseScrollCallback = new GLFWScrollCallback() {
+
+			@Override
+			public void invoke(long window, double xOffset, double yOffset) {
+
+				float sensitivity = 4;
+				float offset = (float)(xOffset * sensitivity + yOffset * sensitivity);
+				if (saveButtons.get(0).y > -sensitivity && offset > 0) {
+					offset = -saveButtons.get(0).y;
+				}
+
+				for (int i = 0; i < saveButtons.size(); i++) {
+					saveButtons.get(i).y += offset;
+					if (saveButtons.get(i).y > r.screen.getHeight() - 50) {
+						saveButtons.get(i).enabled = false;
+					} else {
+						saveButtons.get(i).enabled = true;
+					}
+					
+				}
+			}
+		});
+
 		super.draw();
 	}
 
@@ -82,6 +107,7 @@ public class SaveSelect extends GuiScreen {
 		}
 		for (int i = 0; i < saveButtons.size(); i++) {
 			if (control == saveButtons.get(i)) {
+				
 				game.startWorld(directories[i]);
 				game.openGui(null);
 			}

@@ -34,24 +34,27 @@ public class LabeledButton extends GuiControl {
 
 	@Override
 	public void draw() {
-		MainRenderer r = screen.game.renderer;
-		float sx = getScaledX();
-		float sy = getScaledY();
+		if (enabled) {
+			MainRenderer r = screen.game.renderer;
+			float sx = getScaledX();
+			float sy = getScaledY();
 
-		r.draw2D.drawQuad(Quad.shared()
-				.at(sx, sy)
-				.size(width, height)
-				.withColor(0.25f, 0.25f, 0.25f)
-		);
-		r.draw2D.drawQuad(Quad.shared()
-				.at(sx + 1.0f, sy + 1.0f)
-				.size(width - 2.0f, height - 2.0f)
-				.withColor(0.5f, 0.5f, 0.5f)
-		);
-		r.fonts.shadowed.printCentered(
-				text,
-				sx + width / 2.0f,
-				sy + (height - r.fonts.normal.lineHeight) / 2.0f
-		);
+			r.draw2D.drawQuad(Quad.shared()
+					.at(sx, sy)
+					.size(width, height)
+					.withColor(0.25f, 0.25f, 0.25f)
+			);
+			r.draw2D.drawQuad(Quad.shared()
+					.at(sx + 1.0f, sy + 1.0f)
+					.size(width - 2.0f, height - 2.0f)
+					.withColor(0.5f, 0.5f, 0.5f)
+			);
+			r.fonts.shadowed.printCentered(
+					text,
+					sx + width / 2.0f,
+					sy + (height - r.fonts.normal.lineHeight) / 2.0f
+			);
+		}
+	
 	}
 }

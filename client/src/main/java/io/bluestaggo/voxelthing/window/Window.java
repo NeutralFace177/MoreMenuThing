@@ -271,4 +271,8 @@ public class Window {
 	public static double getTimeElapsed() {
 		return glfwGetTime();
 	}
+
+	public long getHandle() {
+		return handle;
+	}
 }

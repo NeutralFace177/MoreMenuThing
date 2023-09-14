@@ -12,6 +12,7 @@ public class GuiControl {
 	public float height;
 	public float alignX;
 	public float alignY;
+	public boolean enabled = true;
 
 	public GuiControl(GuiScreen screen) {
 		this.screen = screen;
@@ -28,6 +29,7 @@ public class GuiControl {
 		this.height = height;
 		return this;
 	}
+
 
 	public GuiControl alignedAt(float alignX, float alignY) {
 		this.alignX = alignX;
@@ -48,11 +50,14 @@ public class GuiControl {
 	}
 
 	public void draw() {
-		MainRenderer r = screen.game.renderer;
-		r.draw2D.drawQuad(Quad.shared()
+		if (enabled) {
+			MainRenderer r = screen.game.renderer;
+			r.draw2D.drawQuad(Quad.shared()
 				.at(getScaledX(), getScaledY())
 				.size(width, height)
 		);
+		}
+		
 	}
 
 	public boolean intersects(int x, int y) {
