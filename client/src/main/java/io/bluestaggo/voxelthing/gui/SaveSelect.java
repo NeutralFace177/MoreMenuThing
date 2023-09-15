@@ -3,6 +3,7 @@ package io.bluestaggo.voxelthing.gui;
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.gui.control.GuiControl;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
+import io.bluestaggo.voxelthing.gui.control.TextInput;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
@@ -84,7 +85,7 @@ public class SaveSelect extends GuiScreen {
 
 				for (int i = 0; i < saveButtons.size(); i++) {
 					saveButtons.get(i).y += offset;
-					if (saveButtons.get(i).y > r.screen.getHeight() - 50) {
+					if (saveButtons.get(i).y > r.screen.getHeight() - 80 || saveButtons.get(i).y < 0) {
 						saveButtons.get(i).enabled = false;
 					} else {
 						saveButtons.get(i).enabled = true;
@@ -102,8 +103,7 @@ public class SaveSelect extends GuiScreen {
 	@Override
 	public void onControlClicked(GuiControl control, int button) {
 		if (control == newWorldButton) {
-			game.startWorld();
-			game.openGui(null);
+			game.openGui(new WorldCreateMenu(game));
 		}
 		for (int i = 0; i < saveButtons.size(); i++) {
 			if (control == saveButtons.get(i)) {

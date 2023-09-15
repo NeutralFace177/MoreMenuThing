@@ -28,6 +28,8 @@ import java.util.Optional;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
 
+import org.lwjgl.glfw.Callbacks;
+
 public class Game {
 	public static final String VERSION;
 	public static final int TICKS_PER_SECOND = 20;
@@ -156,11 +158,12 @@ public class Game {
 
 	public void startWorld() {
 		startWorld(null);
+		Callbacks.glfwFreeCallbacks(window.getHandle());
 	}
 
 	public void startWorld(String name) {
 		exitWorld();
-
+		Callbacks.glfwFreeCallbacks(window.getHandle());
 		ISaveHandler saveHandler = null;
 		if (name != null) {
 			try {
