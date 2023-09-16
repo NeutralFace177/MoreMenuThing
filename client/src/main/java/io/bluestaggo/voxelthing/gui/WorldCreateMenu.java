@@ -10,6 +10,7 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class WorldCreateMenu extends GuiScreen{
 
@@ -29,11 +30,12 @@ public class WorldCreateMenu extends GuiScreen{
 		);
         
         worldNameInput = new TextInput(this);
-        worldNameInput.withText("").alignedAt(0.70f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
+        worldNameInput.withText("").alignedAt(0.30f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
+        
         worldNameControl = addControl(worldNameInput);
         
         seedInput = new TextInput(this);
-        seedInput.withText("").alignedAt(0.30f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
+        seedInput.alignedAt(0.70f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
         seedControl = addControl(seedInput);
     }
 
@@ -56,6 +58,13 @@ public class WorldCreateMenu extends GuiScreen{
 	}
 
     @Override
+	protected void onKeyPressed(int key) {
+		if (key == GLFW_KEY_ESCAPE) {
+            game.openGui(new SaveSelect(game));
+        }
+	}
+
+    @Override
 	public void onControlClicked(GuiControl control, int button) {
 		if (control == worldNameControl) {
 			worldNameInput.imputting = true;
@@ -64,6 +73,10 @@ public class WorldCreateMenu extends GuiScreen{
         if (control == seedControl) {
             seedInput.imputting = true;
             worldNameInput.imputting = false;
+        }
+        if (control == newWorldButton) {
+            game.startWorld(worldNameInput.text.toString());
+			game.openGui(null);
         }
 		
 	}

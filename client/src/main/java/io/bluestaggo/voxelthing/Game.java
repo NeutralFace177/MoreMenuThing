@@ -158,12 +158,10 @@ public class Game {
 
 	public void startWorld() {
 		startWorld(null);
-		Callbacks.glfwFreeCallbacks(window.getHandle());
 	}
 
 	public void startWorld(String name) {
 		exitWorld();
-		Callbacks.glfwFreeCallbacks(window.getHandle());
 		ISaveHandler saveHandler = null;
 		if (name != null) {
 			try {

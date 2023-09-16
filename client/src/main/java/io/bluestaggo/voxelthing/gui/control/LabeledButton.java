@@ -10,6 +10,7 @@ public class LabeledButton extends GuiControl {
 
 	public LabeledButton(GuiScreen screen) {
 		super(screen);
+		this.text = "";
 	}
 
 	public LabeledButton withText(String text) {

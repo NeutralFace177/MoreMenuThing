@@ -9,13 +9,12 @@ import static org.lwjgl.glfw.GLFW.*;
 
 import java.util.Arrays;
 
-import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWKeyCallbackI;
+import org.lwjgl.glfw.GLFWCharCallback;
+import org.lwjgl.glfw.GLFWCharCallbackI;
 
 public class TextInput extends LabeledButton {
 
-    public boolean imputting = true;
-
+    public boolean imputting = false;
 
     public TextInput(GuiScreen screen) {
         super(screen);
@@ -24,30 +23,32 @@ public class TextInput extends LabeledButton {
 
 
     public void inputText() {
-            GLFWKeyCallbackI keyCallback;
-            glfwSetKeyCallback(Game.getInstance().window.getHandle(), keyCallback = new GLFWKeyCallback() {
+            GLFWCharCallbackI keyCallback;
+            glfwSetCharCallback(Game.getInstance().window.getHandle(), keyCallback = new GLFWCharCallback() {
                 @Override
-                public void invoke(long window, int key, int scancode, int action, int mods) {
-                    if (action != 0) {
-                        if (key == GLFW_KEY_BACKSPACE) {
-                            text = "";
-                        }
-                        if (mods != 1 && key >= 65 && key <= 90) {
-                            key += 32;
-                        }
+                public void invoke(long window, int key) {
+                    if (key != 0) {
                         text += ((char)key);
                     }
+                    if (key == GLFW_KEY_BACKSPACE) {
+                        text = "";
+                    }
+                    
                 }
-            });
-        
-        
+        }); 
     }
+
+
 
     @Override
 	public void draw() {
-        if (imputting) {
-            inputText();
+        if (text == "") {
+         System.out.println("null mc mull");
         }
+        if (imputting) {
+           inputText();
+        }
+
 		if (enabled) {
 			MainRenderer r = screen.game.renderer;
 			float sx = getScaledX();
