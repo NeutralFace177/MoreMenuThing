@@ -6,6 +6,7 @@ import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 import io.bluestaggo.voxelthing.world.storage.EmptySaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
@@ -20,6 +21,7 @@ public class World implements IBlockAccess {
 	protected final ChunkStorage chunkStorage;
 	private final GenCache genCache;
 	public final ISaveHandler saveHandler;
+	public final WorldType worldType;
 
 	public final Random random = new Random();
 	public final WorldInfo info = new WorldInfo();
@@ -27,10 +29,10 @@ public class World implements IBlockAccess {
 	public double partialTick;
 
 	public World() {
-		this(null);
+		this(null, WorldType.Normal);
 	}
 
-	public World(ISaveHandler saveHandler) {
+	public World(ISaveHandler saveHandler, WorldType type) {
 		if (saveHandler == null) {
 			saveHandler = new EmptySaveHandler();
 		}
@@ -39,7 +41,10 @@ public class World implements IBlockAccess {
 		genCache = new GenCache(this);
 		this.saveHandler = saveHandler;
 
+		this.worldType = type;
+
 		info.seed = random.nextLong();
+		info.type = type;
 
 		CompoundItem data = saveHandler.loadWorldData();
 		if (data != null) {
@@ -106,7 +111,7 @@ public class World implements IBlockAccess {
 		}
 
 		Chunk chunk = chunkStorage.newChunkAt(cx, cy, cz);
-		GenerationInfo genInfo = genCache.getGenerationAt(cx, cz);
+		GenerationInfo genInfo = genCache.getGenerationAt(cx, cz, worldType);
 
 		genInfo.generate();
 

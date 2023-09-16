@@ -21,13 +21,13 @@ public class GenCache {
 		return (x << RADIUS_POW2 | z);
 	}
 
-	public GenerationInfo getGenerationAt(int x, int z) {
+	public GenerationInfo getGenerationAt(int x, int z, WorldType type) {
 		GenerationInfo entry = cache[cacheCoords(x, z)];
 		if (entry != null && entry.chunkX == x && entry.chunkZ == z) {
 			return entry;
 		}
 
-		entry = new GenerationInfo(world.info.seed, x, z);
+		entry = new GenerationInfo(world.info.seed, x, z, type);
 		cache[cacheCoords(x, z)] = entry;
 		return entry;
 	}

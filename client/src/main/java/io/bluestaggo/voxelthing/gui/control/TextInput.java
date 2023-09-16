@@ -15,6 +15,7 @@ import org.lwjgl.glfw.GLFWCharCallbackI;
 public class TextInput extends LabeledButton {
 
     public boolean imputting = false;
+    public String emptyText = "________";
 
     public TextInput(GuiScreen screen) {
         super(screen);
@@ -38,7 +39,10 @@ public class TextInput extends LabeledButton {
         }); 
     }
 
-
+    public TextInput setEmptyText(String txt) {
+        emptyText = txt;
+        return this;
+    }
 
     @Override
 	public void draw() {
@@ -66,7 +70,7 @@ public class TextInput extends LabeledButton {
 			);
  
 			r.fonts.shadowed.printCentered(
-					text == "" ? "______" : text,
+					text == "" ? emptyText : text,
 					sx + width / 2.0f,
 					sy + (height - r.fonts.normal.lineHeight) / 2.0f
 			);

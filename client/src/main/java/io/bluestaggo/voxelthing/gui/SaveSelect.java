@@ -7,6 +7,7 @@ import io.bluestaggo.voxelthing.gui.control.TextInput;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.glfw.GLFW.*;
@@ -108,7 +109,7 @@ public class SaveSelect extends GuiScreen {
 		for (int i = 0; i < saveButtons.size(); i++) {
 			if (control == saveButtons.get(i)) {
 				
-				game.startWorld(directories[i]);
+				game.startWorld(directories[i], WorldType.Normal);
 				game.openGui(null);
 			}
 		}

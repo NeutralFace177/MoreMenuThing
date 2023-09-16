@@ -19,6 +19,8 @@ public class GenerationInfo {
 	private final long cliffHeightSeed;
 	private final long caveSeed;
 
+	public final WorldType worldType;
+
 	public final float offset = -9/11f;
 
 	private final float[] height = new float[Chunk.AREA];
@@ -27,7 +29,7 @@ public class GenerationInfo {
 
 	private boolean hasGenerated;
 
-	public GenerationInfo(long salt, int cx, int cz) {
+	public GenerationInfo(long salt, int cx, int cz, WorldType type) {
 		randSeed = salt;
 
 		baseSeed = splitMix();
@@ -35,6 +37,8 @@ public class GenerationInfo {
 		cliffSeed = splitMix();
 		cliffHeightSeed = splitMix();
 		caveSeed = splitMix();
+
+		worldType = type;
 
 		chunkX = cx;
 		chunkZ = cz;

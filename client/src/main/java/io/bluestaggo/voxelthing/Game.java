@@ -14,6 +14,7 @@ import io.bluestaggo.voxelthing.world.World;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
@@ -157,10 +158,14 @@ public class Game {
 	}
 
 	public void startWorld() {
-		startWorld(null);
+		startWorld(null, WorldType.Normal);
 	}
 
-	public void startWorld(String name) {
+	public void startWorld(WorldType type) {
+		startWorld(null, type);
+	}
+
+	public void startWorld(String name, WorldType type) {
 		exitWorld();
 		ISaveHandler saveHandler = null;
 		if (name != null) {
@@ -172,7 +177,7 @@ public class Game {
 			}
 		}
 
-		world = new ClientWorld(this, saveHandler);
+		world = new ClientWorld(this, saveHandler, type);
 		saveHandler = world.saveHandler;
 		playerController = new ClientPlayerController(this);
 		player = new Player(world, playerController);

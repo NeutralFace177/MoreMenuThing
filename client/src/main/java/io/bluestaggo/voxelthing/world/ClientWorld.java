@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
 import java.util.ArrayList;
@@ -15,8 +16,8 @@ import java.util.stream.Collectors;
 public class ClientWorld extends World {
 	public final Game game;
 
-	public ClientWorld(Game game, ISaveHandler saveHandler) {
-		super(saveHandler);
+	public ClientWorld(Game game, ISaveHandler saveHandler, WorldType type) {
+		super(saveHandler, type);
 		this.game = game;
 		game.renderer.worldRenderer.setWorld(this);
 		game.renderer.worldRenderer.loadRenderers();

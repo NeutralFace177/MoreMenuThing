@@ -8,6 +8,7 @@ import io.bluestaggo.voxelthing.gui.control.TextInput;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.glfw.GLFW.*;
@@ -35,7 +36,7 @@ public class WorldCreateMenu extends GuiScreen{
         worldNameControl = addControl(worldNameInput);
         
         seedInput = new TextInput(this);
-        seedInput.alignedAt(0.70f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
+        seedInput.setEmptyText("Not Implemented").alignedAt(0.70f, 0.25f).at(-50.0f,0f).size(100.0f, 20.0f).at(-50, 5);
         seedControl = addControl(seedInput);
     }
 
@@ -75,7 +76,7 @@ public class WorldCreateMenu extends GuiScreen{
             worldNameInput.imputting = false;
         }
         if (control == newWorldButton) {
-            game.startWorld(worldNameInput.text.toString());
+            game.startWorld(worldNameInput.text.toString(), WorldType.Normal);
 			game.openGui(null);
         }
 		
