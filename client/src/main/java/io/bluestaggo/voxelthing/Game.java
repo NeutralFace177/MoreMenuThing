@@ -177,7 +177,7 @@ public class Game {
 			}
 		}
 
-		world = new ClientWorld(this, saveHandler, type);
+		world = new ClientWorld(this, saveHandler);
 		saveHandler = world.saveHandler;
 		playerController = new ClientPlayerController(this);
 		player = new Player(world, playerController);
@@ -186,6 +186,24 @@ public class Game {
 		if (playerData != null) {
 			player.deserialize(playerData);
 		}
+	}
+
+	public void createWorld(String name, WorldType type) {
+		exitWorld();
+		ISaveHandler saveHandler = null;
+		if (name != null) {
+			try {
+				saveHandler = new FolderSaveHandler(worldDir.resolve(name));
+			} catch (IOException e) {
+				System.out.println("Cannot save world \"" + name + "\"! Playing without saving.");
+				e.printStackTrace();
+			}
+		}
+
+		world = new ClientWorld(this, saveHandler, type);
+		saveHandler = world.saveHandler;
+		playerController = new ClientPlayerController(this);
+		player = new Player(world, playerController);
 	}
 
 	public void exitWorld() {
@@ -340,7 +358,7 @@ public class Game {
 					debugGui.draw();
 				}
 				inGameGui.draw();
-			} else {
+			} else if (currentGui instanceof SaveSelect != true) {
 				Texture bgTex = renderer.textures.getTexture("/assets/gui/background.png");
 
 				float width = renderer.screen.getWidth();

@@ -62,14 +62,24 @@ public class SaveSelect extends GuiScreen {
 	public void draw() {
 		MainRenderer r = game.renderer;
 
+		
 		try (var state = new GLState()) {
 			state.enable(GL_BLEND);
 			r.draw2D.drawQuad(Quad.shared()
 					.at(0.0f, 30.0f)
 					.size(r.screen.getWidth(), r.screen.getHeight() - 60.0f)
-					.withColor(0.0f, 0.0f, 0.0f, 0.5f));
+					.withTexture(r.textures.getTexture("/assets/gui/background.png"))
+					.withUV(0.0f,0.0f,r.screen.getWidth() / r.textures.getTexture("/assets/gui/background.png").width, 128 / r.textures.getTexture("/assets/gui/background.png").width)
+					);
+			r.draw2D.drawQuad(Quad.shared()
+					.at(0.0f, 32.0f)
+					.size(r.screen.getWidth(), r.screen.getHeight() - 60.0f)
+					.withColor(0.0f, 0.0f, 0.0f, 0.5f)
+					);
 
-			r.fonts.outlined.printCentered("SELECT WORLD", r.screen.getWidth() / 2.0f, 10.0f);
+			
+
+			
 		}
 
 		GLFWScrollCallbackI mouseScrollCallback; 
@@ -80,23 +90,29 @@ public class SaveSelect extends GuiScreen {
 
 				float sensitivity = 4;
 				float offset = (float)(xOffset * sensitivity + yOffset * sensitivity);
-				if (saveButtons.get(0).y > -sensitivity && offset > 0) {
+				if (saveButtons.get(0).y > -sensitivity && offset > 0 && (saveButtons.get(saveButtons.size()-1).y < r.screen.getHeight() - sensitivity)) {
 					offset = -saveButtons.get(0).y;
 				}
 
 				for (int i = 0; i < saveButtons.size(); i++) {
 					saveButtons.get(i).y += offset;
-					if (saveButtons.get(i).y > r.screen.getHeight() - 80 || saveButtons.get(i).y < 0) {
-						saveButtons.get(i).enabled = false;
-					} else {
-						saveButtons.get(i).enabled = true;
-					}
-					
 				}
 			}
 		});
-
 		super.draw();
+		r.draw2D.drawQuad(Quad.shared()
+				.at(0.0f,0.0f)
+				.size(r.screen.getWidth(),32.0f)
+				.withTexture(r.textures.getTexture("/assets/gui/background.png"))
+				.withUV(0.0f, 0.0f, r.screen.getWidth() / r.textures.getTexture("/assets/gui/background.png").width, 32 / r.textures.getTexture("/assets/gui/background.png").height));
+		r.draw2D.drawQuad(Quad.shared()
+				.at(0.0f,r.screen.getHeight()- 30)
+				.size(r.screen.getWidth(),32.0f)
+				.withTexture(r.textures.getTexture("/assets/gui/background.png"))
+				.withUV(0.0f, 0.0f, r.screen.getWidth() / r.textures.getTexture("/assets/gui/background.png").width, 32 / r.textures.getTexture("/assets/gui/background.png").height));
+		r.fonts.outlined.printCentered("SELECT WORLD", r.screen.getWidth() / 2.0f, 10.0f);
+		newWorldButton.draw();
+
 	}
 
 	

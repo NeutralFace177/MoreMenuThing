@@ -53,7 +53,7 @@ public class OptionsMenu extends GuiScreen {
 					.withColor(0.0f, 0.0f, 0.0f, 0.8f)
 			);
 
-			String title = "WEeeEEEEeeEEeEeE Options Goes Here";
+			String title = "Options";
 			r.fonts.outlined.print(title, (r.screen.getWidth() - r.fonts.outlined.getStringLength(title)) / 2.0f, 20);
 		}
         goTo69dot420MilAway.draw();

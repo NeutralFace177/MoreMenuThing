@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 public class ClientWorld extends World {
 	public final Game game;
 
+	public ClientWorld(Game game, ISaveHandler saveHandler) {
+		this(game,saveHandler,WorldType.Normal);
+	}
+
 	public ClientWorld(Game game, ISaveHandler saveHandler, WorldType type) {
 		super(saveHandler, type);
 		this.game = game;

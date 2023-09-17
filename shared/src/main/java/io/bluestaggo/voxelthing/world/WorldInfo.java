@@ -11,7 +11,12 @@ public class WorldInfo {
 
 	public void deserialize(CompoundItem data) {
 		seed = data.map.get("seed").getLong();
-		type = type.intTWorldType(data.map.get("worldType").getInt());
+		try {
+			type = type.intTWorldType(data.map.get("worldType").getInt());
+		} catch (Exception e) {
+			// 
+		}
+
 	}
 
 	public CompoundItem serialize() {

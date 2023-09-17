@@ -32,6 +32,10 @@ public class World implements IBlockAccess {
 		this(null, WorldType.Normal);
 	}
 
+	public World(ISaveHandler saveHandler) {
+		this(saveHandler, WorldType.Normal);
+	}
+
 	public World(ISaveHandler saveHandler, WorldType type) {
 		if (saveHandler == null) {
 			saveHandler = new EmptySaveHandler();
@@ -123,14 +127,17 @@ public class World implements IBlockAccess {
 					int yy = cy * Chunk.LENGTH + y;
 					boolean cave = yy < height && genInfo.getCave(x, yy, z);
 					Block block = null;
+					int waterLevel = genInfo.waterLevel;
 
 					if (!cave) {
 						if (yy < height - 4) {
 							block = Block.STONE;
 						} else if (yy < height - 1) {
 							block = Block.DIRT;
-						} else if (yy < height) {
+						} else if (yy < height && yy > waterLevel) {
 							block = Block.GRASS;
+						} else if (yy < height && yy < waterLevel) {
+							block = Block.SAND;
 						}
 					}
 

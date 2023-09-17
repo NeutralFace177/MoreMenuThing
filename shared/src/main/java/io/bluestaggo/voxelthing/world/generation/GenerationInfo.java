@@ -19,6 +19,8 @@ public class GenerationInfo {
 	private final long cliffHeightSeed;
 	private final long caveSeed;
 
+	public int waterLevel = -4;
+
 	public final WorldType worldType;
 
 	public final float offset = -9/11f;
@@ -51,8 +53,8 @@ public class GenerationInfo {
 		hasGenerated = true;
 
 		final int baseOctaves = 4;
-		final double baseScale = 250.0;
-		final float baseHeightScale = 8.0f;
+		final double baseScale = 275.0;
+		final float baseHeightScale = 10.0f;
 
 		final int hillOctaves = 3;
 		final double hillScale = 250.0;
@@ -71,6 +73,7 @@ public class GenerationInfo {
 		final float cliffHeightMax = 8.0f;
 
 
+		final long seed = splitMix();
 
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
@@ -81,16 +84,39 @@ public class GenerationInfo {
 				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, (xx + offset) / hillScale, (zz + offset) / hillScale);
 				hill = 1.0f - (float) Math.cos(MathUtil.threshold(hill, hillThresholdMin, hillThresholdMax) * MathUtil.PI_F / 2.0f);
 
-				float addedBaseHeight = baseHeightScale * MathUtil.lerp(1.0f, hillHeightScaleMod, hill);
+				float chaosNoise = OpenSimplex2Octaves.noise2(seed, 2, xx / baseScale, zz / baseScale);
+
+				if (worldType == WorldType.Chaotic) {
+					baseHeight = MathUtil.floorMod(baseHeight, chaosNoise);
+					hill = MathUtil.floorMod(hill, chaosNoise);
+				}
+
+			//	float mod = worldType == WorldType.Chaotic ? 2.25f : 5.5f;
+				float mod;
+				if (worldType == WorldType.Chaotic) {
+					mod = 2.25f;
+				} else {
+					mod = 5.5f;
+				}
+
+				float addedBaseHeight = baseHeightScale * MathUtil.lerp(mod, hillHeightScaleMod, hill);
 				baseHeight = baseHeight * addedBaseHeight + hill * hillHeightScale;
 
 				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, (xx + offset) / cliffScale, (zz + offset) / cliffScale);
 				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, (xx + offset) / cliffHeightScale, (zz + offset) / cliffHeightScale);
 				cliffHeight = MathUtil.lerp(cliffHeightMin, cliffHeightMax, cliffHeight / 2.0f + 0.5f) * (1.0f - hill * 5.0f);
 
+				if (worldType == WorldType.Chaotic) {
+					cliff = MathUtil.floorMod(cliff, chaosNoise);
+					cliff = MathUtil.floorMod(cliffHeight, chaosNoise);
+				}
+
 				if (cliff > cliffThreshold) {
 					baseHeight += cliffHeight;
 				}
+				float exp = worldType == WorldType.Chaotic ? 0.15f : 0.08f;
+				baseHeight = baseHeight > 20 ? baseHeight + (float)Math.pow(Math.exp(baseHeight-20),exp)-2 : baseHeight;
+				baseHeight = baseHeight < waterLevel-5 ? -(float)Math.log(Math.pow(Math.abs(baseHeight), 7)) + 6 : baseHeight;
 
 				height[x + z * Chunk.LENGTH] = baseHeight;
 			}
@@ -113,9 +139,9 @@ public class GenerationInfo {
 			generateCaves(y >> Chunk.SIZE_POW2);
 		}
 
-		final float cheeseMinDensity = -1.0f;
-		final float cheeseMaxDensity = -0.3f;
-		final float cheeseDensitySpread = 100.0f;
+		final float cheeseMinDensity = worldType == WorldType.Chaotic ? -0.7f : -1.0f;
+		final float cheeseMaxDensity = worldType == WorldType.Chaotic ? -0.5f : -0.3f;
+		final float cheeseDensitySpread = worldType == WorldType.Chaotic ? 80.0f : 100.0f;
 		final float cheeseDensitySurface = -0.5f;
 
 		int xx = x / 4;
@@ -142,6 +168,8 @@ public class GenerationInfo {
 		final int cheeseOctaves = 4;
 		final double cheeseScaleXZ = 100.0;
 		final double cheeseScaleY = 50.0;
+		
+		final long seed = splitMix();
 
 		for (int x = 0; x < LERP_MAP_LENGTH; x++) {
 			for (int y = 0; y < LERP_MAP_LENGTH; y++) {
@@ -151,6 +179,11 @@ public class GenerationInfo {
 					int zz = (z << 2) + (chunkZ << Chunk.SIZE_POW2);
 
 					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, (xx + (int)offset) / cheeseScaleXZ, (yy + (int)offset) / cheeseScaleY, (zz + (int)offset) / cheeseScaleXZ);
+					float chaosNoise = OpenSimplex2Octaves.noise3_ImproveXZ(seed, 2, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
+
+					if (worldType == WorldType.Chaotic) {
+						cheese = MathUtil.floorMod(cheese, chaosNoise) * MathUtil.lerp(cheese, chaosNoise, MathUtil.floorMod(cheese, chaosNoise)) * 50;
+					}
 					caveInfo[MathUtil.index3D(x, y, z, LERP_MAP_LENGTH)] = cheese;
 				}
 			}

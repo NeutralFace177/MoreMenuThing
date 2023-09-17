@@ -16,6 +16,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class WorldCreateMenu extends GuiScreen{
 
     private final GuiControl newWorldButton;
+    private final GuiControl newChaoticWorldButton;
     private final GuiControl worldNameControl;
     private final TextInput worldNameInput;
     private final GuiControl seedControl;
@@ -25,7 +26,13 @@ public class WorldCreateMenu extends GuiScreen{
         super(game);
         newWorldButton = addControl(new LabeledButton(this)
 				.withText("Create World")
-				.at(-50.0f, -25.0f)
+				.at(10.0f, -25.0f)
+				.size(100.0f, 20.0f)
+				.alignedAt(0.5f, 1.0f)
+		);
+        newChaoticWorldButton = addControl(new LabeledButton(this)
+				.withText("Create Chaotic World")
+				.at(-110.0f, -25.0f)
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 1.0f)
 		);
@@ -78,6 +85,10 @@ public class WorldCreateMenu extends GuiScreen{
         if (control == newWorldButton) {
             game.startWorld(worldNameInput.text.toString(), WorldType.Normal);
 			game.openGui(null);
+        }
+        if (control == newChaoticWorldButton) {
+            game.createWorld(worldNameInput.text.toString(), WorldType.Chaotic);
+            game.openGui(null);
         }
 		
 	}
