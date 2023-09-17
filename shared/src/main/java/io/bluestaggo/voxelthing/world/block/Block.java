@@ -55,6 +55,8 @@ public class Block {
 	public static final Block GRAVEL = new Block("gravel").withTex(2, 1);
 	public static final Block STONE_BRICKS = new Block("stone_bricks").withTex(2, 2);
 	public static final Block POLISHED_STONE = new Block("polished_stone").withTex(1, 2);
+	public static final Block WATER = new Block("water").withTex(4,3).transparency(BlockTransparency.FULL);
+	public static final Block SNOW = new Block("snow").withTex(4,4);
 	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
 			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);

@@ -108,39 +108,122 @@ public class World implements IBlockAccess {
 			return;
 		}
 
-		CompoundItem data = saveHandler.loadChunkData(cx, cy, cz);
-		if (data != null) {
-			chunkStorage.deserializeChunkAt(cx, cy, cz, data);
-			return;
-		}
-
 		Chunk chunk = chunkStorage.newChunkAt(cx, cy, cz);
 		GenerationInfo genInfo = genCache.getGenerationAt(cx, cz, worldType);
 
-		genInfo.generate();
 
+		genInfo.generate();
+		int vx = (int)((Math.round(cx*32/genInfo.gridDist) * 50));
+		int vz = (int)((Math.round(cz*32/genInfo.gridDist) * 50));
+		genInfo.voronoiSeedsGen(vx, vz);
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				float height = genInfo.getHeight(x, z);
-
+				float exp = worldType == WorldType.Normal ? 0.08f : 0.15f;
+				height = height > 20 ? height + (float)Math.pow(Math.exp(height-20),exp)-1 : height;
+				
 				for (int y = 0; y < Chunk.LENGTH; y++) {
 					int yy = cy * Chunk.LENGTH + y;
+					int xx = cx * Chunk.LENGTH + x;
+					int zz = cz * Chunk.LENGTH + z;
 					boolean cave = yy < height && genInfo.getCave(x, yy, z);
 					Block block = null;
-					int waterLevel = genInfo.waterLevel;
-
+					//increase water level for chaotic world
+					int waterLevel = worldType == WorldType.Normal ? 0 : 2;
 					if (!cave) {
 						if (yy < height - 4) {
 							block = Block.STONE;
-						} else if (yy < height - 1) {
+						} else if (yy < height - 1 && yy < 23) {
 							block = Block.DIRT;
-						} else if (yy < height && yy > waterLevel) {
+							//blends grass -> snow
+							if (yy > 18) {
+								if (Math.random() > 0.5) {
+									block = Block.DIRT;
+								} else {
+									block = Block.SNOW;
+								}
+							}
+						} else if (yy < height && yy > waterLevel && yy < 23) {
 							block = Block.GRASS;
+							//blends grass -> snow
+							if (yy > 18) {
+								if (Math.random() > 0.5) {
+									block = Block.GRASS;
+								} else {
+									block = Block.SNOW;
+								}
+							}
 						} else if (yy < height && yy < waterLevel) {
 							block = Block.SAND;
+						} else if (yy < height && yy > 22) {
+							block = Block.SNOW;
+						} else if (yy < waterLevel && worldType == WorldType.Normal) {
+							block = Block.WATER;
+						}
+						
+					if (genInfo.genTree(xx, zz) && yy == Math.round(height) && yy + 8 < cy * Chunk.LENGTH + 32) {
+						block = Block.LOG;
+						setBlock(xx, yy+1, zz, Block.LOG);
+						setBlock(xx, yy+2, zz, Block.LOG);
+						setBlock(xx, yy+3, zz, Block.LOG);
+
+						setBlock(xx+1, yy+3, zz, Block.LEAVES);
+						setBlock(xx-1, yy+3, zz, Block.LEAVES);
+						setBlock(xx, yy+3, zz+1, Block.LEAVES);
+						setBlock(xx, yy+3, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+3, zz+1, Block.LEAVES);
+						setBlock(xx-1, yy+3, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+3, zz-1, Block.LEAVES);
+						setBlock(xx-1, yy+3, zz+1, Block.LEAVES);
+						setBlock(xx+2, yy+3, zz, Block.LEAVES);
+						setBlock(xx-2, yy+3, zz, Block.LEAVES);
+						setBlock(xx, yy+3, zz-2, Block.LEAVES);
+						setBlock(xx, yy+3, zz+2, Block.LEAVES);
+
+						setBlock(xx+1, yy+4, zz, Block.LEAVES);
+						setBlock(xx-1, yy+4, zz, Block.LEAVES);
+						setBlock(xx, yy+4, zz+1, Block.LEAVES);
+						setBlock(xx, yy+4, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+4, zz+1, Block.LEAVES);
+						setBlock(xx-1, yy+4, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+4, zz-1, Block.LEAVES);
+						setBlock(xx-1, yy+4, zz+1, Block.LEAVES);
+						setBlock(xx+2, yy+4, zz, Block.LEAVES);
+						setBlock(xx-2, yy+4, zz, Block.LEAVES);
+						setBlock(xx, yy+4, zz-2, Block.LEAVES);
+						setBlock(xx, yy+4, zz+2, Block.LEAVES);
+						setBlock(xx, yy+4, zz, Block.LEAVES);
+
+						setBlock(xx+1, yy+5, zz, Block.LEAVES);
+						setBlock(xx-1, yy+5, zz, Block.LEAVES);
+						setBlock(xx, yy+5, zz+1, Block.LEAVES);
+						setBlock(xx, yy+5, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+5, zz+1, Block.LEAVES);
+						setBlock(xx-1, yy+5, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+5, zz-1, Block.LEAVES);
+						setBlock(xx-1, yy+5, zz+1, Block.LEAVES);
+						setBlock(xx, yy+5, zz, Block.LEAVES);
+
+						setBlock(xx+1, yy+6, zz, Block.LEAVES);
+						setBlock(xx-1, yy+6, zz, Block.LEAVES);
+						setBlock(xx, yy+6, zz+1, Block.LEAVES);
+						setBlock(xx, yy+6, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+6, zz+1, Block.LEAVES);
+						setBlock(xx-1, yy+6, zz-1, Block.LEAVES);
+						setBlock(xx+1, yy+6, zz-1, Block.LEAVES);
+						setBlock(xx-1, yy+6, zz+1, Block.LEAVES);
+						setBlock(xx, yy+6, zz, Block.LEAVES);
+
+						setBlock(xx, yy+7, zz, Block.LEAVES);
+						setBlock(xx, yy+8, zz, Block.LEAVES);
+
+
+
+						if (getBlock(xx, yy-1, zz) == null) {
+							setBlock(xx, yy-1, zz, Block.LOG);
 						}
 					}
-
+				}
 					if (block != null) {
 						chunk.setBlock(x, y, z, block);
 					}
@@ -148,7 +231,6 @@ public class World implements IBlockAccess {
 			}
 		}
 
-		chunk.dontSave();
 		onChunkAdded(cx, cy, cz);
 	}
 

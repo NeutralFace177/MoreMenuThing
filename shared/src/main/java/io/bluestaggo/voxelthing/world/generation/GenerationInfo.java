@@ -4,6 +4,7 @@ import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.math.OpenSimplex2Octaves;
 import io.bluestaggo.voxelthing.world.Chunk;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class GenerationInfo {
@@ -18,12 +19,20 @@ public class GenerationInfo {
 	private final long cliffSeed;
 	private final long cliffHeightSeed;
 	private final long caveSeed;
+	private final long biomeSeed;
+	private final long secondBiomeSeed;
+	private final long treeSeed;
+	private final long treeSeed2;
+
+	public ArrayList<ArrayList<Double>> voronoiSeeds;
+	public ArrayList<ArrayList<Double>> unModVSeeds;
 
 	public int waterLevel = -4;
 
-	public final WorldType worldType;
+	public WorldType worldType;
 
-	public final float offset = -9/11f;
+	public int dist = 100;
+	public int gridDist = 50;
 
 	private final float[] height = new float[Chunk.AREA];
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];
@@ -39,8 +48,15 @@ public class GenerationInfo {
 		cliffSeed = splitMix();
 		cliffHeightSeed = splitMix();
 		caveSeed = splitMix();
+		biomeSeed = splitMix();
+		secondBiomeSeed = splitMix();
+		treeSeed = splitMix();
+		treeSeed2 = splitMix();
 
 		worldType = type;
+
+		voronoiSeedsGen(0, 0);
+		
 
 		chunkX = cx;
 		chunkZ = cz;
@@ -53,18 +69,18 @@ public class GenerationInfo {
 		hasGenerated = true;
 
 		final int baseOctaves = 4;
-		final double baseScale = 275.0;
-		final float baseHeightScale = 10.0f;
+		final double baseScale = 300.0;
+		final float baseHeightScale = 8.0f;
 
 		final int hillOctaves = 3;
-		final double hillScale = 250.0;
+		final double hillScale = 275.0;
 		final float hillHeightScale = 16.0f;
 		final float hillHeightScaleMod = 4.0f;
 		final float hillThresholdMin = -0.5f;
 		final float hillThresholdMax = 1.0f;
 
 		final int cliffOctaves = 2;
-		final double cliffScale = 250.0;
+		final double cliffScale = 300.0;
 		final float cliffThreshold = 0.5f;
 
 		final int cliffHeightOctaves = 1;
@@ -80,47 +96,70 @@ public class GenerationInfo {
 				int xx = (chunkX * Chunk.LENGTH + x);
 				int zz = (chunkZ * Chunk.LENGTH + z);
 
-				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, (xx + offset) / baseScale, (zz + offset) / baseScale);
-				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, (xx + offset) / hillScale, (zz + offset) / hillScale);
-				hill = 1.0f - (float) Math.cos(MathUtil.threshold(hill, hillThresholdMin, hillThresholdMax) * MathUtil.PI_F / 2.0f);
+				float baseHeight = OpenSimplex2Octaves.noise2(baseSeed, baseOctaves, xx / baseScale, zz / baseScale);
+				float hill = OpenSimplex2Octaves.noise2(hillSeed, hillOctaves, xx / hillScale, zz / hillScale);
+				hill = 1.0f - (float) Math.sin(MathUtil.threshold(hill, hillThresholdMin, hillThresholdMax) * MathUtil.PI_F / 2.0f);
 
-				float chaosNoise = OpenSimplex2Octaves.noise2(seed, 2, xx / baseScale, zz / baseScale);
+				float s = OpenSimplex2Octaves.noise2(seed, 2, xx / baseScale, zz / baseScale);
 
 				if (worldType == WorldType.Chaotic) {
-					baseHeight = MathUtil.floorMod(baseHeight, chaosNoise);
-					hill = MathUtil.floorMod(hill, chaosNoise);
+					baseHeight = MathUtil.floorMod(baseHeight, s);
+					hill = MathUtil.floorMod(hill, s);
 				}
 
-			//	float mod = worldType == WorldType.Chaotic ? 2.25f : 5.5f;
-				float mod;
-				if (worldType == WorldType.Chaotic) {
-					mod = 2.25f;
-				} else {
-					mod = 5.5f;
-				}
+				float mod = worldType == WorldType.Normal ? 2.5f : 5.5f;
 
 				float addedBaseHeight = baseHeightScale * MathUtil.lerp(mod, hillHeightScaleMod, hill);
 				baseHeight = baseHeight * addedBaseHeight + hill * hillHeightScale;
 
-				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, (xx + offset) / cliffScale, (zz + offset) / cliffScale);
-				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, (xx + offset) / cliffHeightScale, (zz + offset) / cliffHeightScale);
+				float cliff = OpenSimplex2Octaves.noise2(cliffSeed, cliffOctaves, xx / cliffScale, zz / cliffScale);
+				float cliffHeight = OpenSimplex2Octaves.noise2(cliffHeightSeed, cliffHeightOctaves, xx / cliffHeightScale, zz / cliffHeightScale);
 				cliffHeight = MathUtil.lerp(cliffHeightMin, cliffHeightMax, cliffHeight / 2.0f + 0.5f) * (1.0f - hill * 5.0f);
 
 				if (worldType == WorldType.Chaotic) {
-					cliff = MathUtil.floorMod(cliff, chaosNoise);
-					cliff = MathUtil.floorMod(cliffHeight, chaosNoise);
+					cliff = MathUtil.floorMod(cliff, s);
+					cliff = MathUtil.floorMod(cliffHeight, s);
 				}
+				
+				
 
 				if (cliff > cliffThreshold) {
 					baseHeight += cliffHeight;
 				}
-				float exp = worldType == WorldType.Chaotic ? 0.15f : 0.08f;
-				baseHeight = baseHeight > 20 ? baseHeight + (float)Math.pow(Math.exp(baseHeight-20),exp)-2 : baseHeight;
-				baseHeight = baseHeight < waterLevel-5 ? -(float)Math.log(Math.pow(Math.abs(baseHeight), 7)) + 6 : baseHeight;
 
 				height[x + z * Chunk.LENGTH] = baseHeight;
 			}
+		}      
+	}
+
+	public boolean genTree(int x, int z) {
+
+		double baseScale = 1;
+
+		float trees = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
+		float forest = OpenSimplex2Octaves.noise2(treeSeed2,1, x / 400, z / 400);
+
+		return trees > 0.7 && forest > 0.0;
+	}
+
+	public void voronoiSeedsGen(int x,int z) {
+		
+		ArrayList<ArrayList<Double>> seedArray = new ArrayList<ArrayList<Double>>();
+		ArrayList<ArrayList<Double>> array = new ArrayList<ArrayList<Double>>();
+		int distance = dist + x;
+		int distance2  = dist + z;
+		for (int xx = -distance; xx <= distance; xx += gridDist) {
+			for (int zz = -distance2; zz <= distance2; zz += gridDist) {
+				float seedX = xx + (OpenSimplex2Octaves.noise2(biomeSeed, 1, xx, zz) * (gridDist /2));
+				float seedZ = zz + (OpenSimplex2Octaves.noise2(secondBiomeSeed, 1, xx, zz) * (gridDist/2));
+				seedArray.add(new ArrayList<Double>(Arrays.asList((double)seedX,(double)seedZ)));
+				array.add(new ArrayList<Double>(Arrays.asList((double)xx,(double)zz)));
+
+			}
 		}
+		voronoiSeeds = seedArray;
+		unModVSeeds = array;
+		System.out.println(voronoiSeeds);
 	}
 
 	private long splitMix() {
@@ -139,14 +178,17 @@ public class GenerationInfo {
 			generateCaves(y >> Chunk.SIZE_POW2);
 		}
 
-		final float cheeseMinDensity = worldType == WorldType.Chaotic ? -0.7f : -1.0f;
-		final float cheeseMaxDensity = worldType == WorldType.Chaotic ? -0.5f : -0.3f;
-		final float cheeseDensitySpread = worldType == WorldType.Chaotic ? 80.0f : 100.0f;
+		final float cheeseMinDensity = -1.0f;
+		final float cheeseMaxDensity = -0.3f;
+		final float cheeseDensitySpread = 100.0f;
 		final float cheeseDensitySurface = -0.5f;
 
-		int xx = x / 4;
-		int yy = (y & Chunk.LENGTH_MASK) / 4;
-		int zz = z / 4;
+		int shiftPow2 = Chunk.SIZE_POW2 - 3;
+		int shiftMask = 3;
+		int shiftDiv = 4;
+		int xx = x >> shiftPow2;
+		int yy = (y & Chunk.LENGTH_MASK) >> shiftPow2;
+		int zz = z >> shiftPow2;
 
 		float c000 = caveInfo[MathUtil.index3D(xx, yy, zz, LERP_MAP_LENGTH)];
 		float c001 = caveInfo[MathUtil.index3D(xx, yy, zz + 1, LERP_MAP_LENGTH)];
@@ -156,7 +198,8 @@ public class GenerationInfo {
 		float c101 = caveInfo[MathUtil.index3D(xx + 1, yy, zz + 1, LERP_MAP_LENGTH)];
 		float c110 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz, LERP_MAP_LENGTH)];
 		float c111 = caveInfo[MathUtil.index3D(xx + 1, yy + 1, zz + 1, LERP_MAP_LENGTH)];
-		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111, (x & 3) / 4.0f, (y & 3) / 4.0f, (z & 3) / 4.0f);
+		float caveInfo = MathUtil.trilinear(c000, c001, c010, c011, c100, c101, c110, c111,
+					(x & shiftMask) / (float) shiftDiv, (y & shiftMask) / (float) shiftDiv, (z & shiftMask) / (float) shiftDiv);
 		float cheeseThreshold = MathUtil.clamp(-y / cheeseDensitySpread + cheeseDensitySurface, cheeseMinDensity, cheeseMaxDensity);
 		return caveInfo < cheeseThreshold;
 	}
@@ -168,22 +211,16 @@ public class GenerationInfo {
 		final int cheeseOctaves = 4;
 		final double cheeseScaleXZ = 100.0;
 		final double cheeseScaleY = 50.0;
-		
-		final long seed = splitMix();
+
 
 		for (int x = 0; x < LERP_MAP_LENGTH; x++) {
 			for (int y = 0; y < LERP_MAP_LENGTH; y++) {
 				for (int z = 0; z < LERP_MAP_LENGTH; z++) {
-					int xx = (x << 2) + (chunkX << Chunk.SIZE_POW2);
-					int yy = (y << 2) + (layer << Chunk.SIZE_POW2);
-					int zz = (z << 2) + (chunkZ << Chunk.SIZE_POW2);
+					int xx = (x << (Chunk.SIZE_POW2 - 3)) + (chunkX << Chunk.SIZE_POW2);
+					int yy = (y << (Chunk.SIZE_POW2 - 3)) + (layer << Chunk.SIZE_POW2);
+					int zz = (z << (Chunk.SIZE_POW2 - 3)) + (chunkZ << Chunk.SIZE_POW2);
 
-					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, (xx + (int)offset) / cheeseScaleXZ, (yy + (int)offset) / cheeseScaleY, (zz + (int)offset) / cheeseScaleXZ);
-					float chaosNoise = OpenSimplex2Octaves.noise3_ImproveXZ(seed, 2, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
-
-					if (worldType == WorldType.Chaotic) {
-						cheese = MathUtil.floorMod(cheese, chaosNoise) * MathUtil.lerp(cheese, chaosNoise, MathUtil.floorMod(cheese, chaosNoise)) * 50;
-					}
+					float cheese = OpenSimplex2Octaves.noise3_ImproveXZ(caveSeed, cheeseOctaves, xx / cheeseScaleXZ, yy / cheeseScaleY, zz / cheeseScaleXZ);
 					caveInfo[MathUtil.index3D(x, y, z, LERP_MAP_LENGTH)] = cheese;
 				}
 			}
