@@ -27,7 +27,8 @@ public class GenerationInfo {
 	public ArrayList<ArrayList<Double>> voronoiSeeds;
 	public ArrayList<ArrayList<Double>> unModVSeeds;
 
-	public int waterLevel = -4;
+	public int waterLevel;
+	public int snowLevel = 23;
 
 	public WorldType worldType;
 
@@ -54,6 +55,7 @@ public class GenerationInfo {
 		treeSeed2 = splitMix();
 
 		worldType = type;
+		waterLevel = worldType == WorldType.Normal ? 0 : 2;
 
 		voronoiSeedsGen(0, 0);
 		
@@ -121,6 +123,9 @@ public class GenerationInfo {
 					cliff = MathUtil.floorMod(cliffHeight, s);
 				}
 				
+				float exp = worldType == WorldType.Normal ? 0.08f : 0.15f;
+				baseHeight = baseHeight > 20 ? baseHeight + (float)Math.pow(Math.exp(baseHeight-20),exp)-1 : baseHeight;
+				baseHeight = baseHeight < waterLevel-3 ? -(float)Math.log(Math.pow(Math.abs(baseHeight), 7)) + 6 : baseHeight;
 				
 
 				if (cliff > cliffThreshold) {

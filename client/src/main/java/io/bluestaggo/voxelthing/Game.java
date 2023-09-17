@@ -289,7 +289,7 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
 			int dist = renderer.worldRenderer.renderDistance;
 			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				if (dist < 16) {
+				if (dist < 64) {
 					dist <<= 1;
 				}
 			} else if (dist > 1) {

@@ -119,8 +119,7 @@ public class World implements IBlockAccess {
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				float height = genInfo.getHeight(x, z);
-				float exp = worldType == WorldType.Normal ? 0.08f : 0.15f;
-				height = height > 20 ? height + (float)Math.pow(Math.exp(height-20),exp)-1 : height;
+
 				
 				for (int y = 0; y < Chunk.LENGTH; y++) {
 					int yy = cy * Chunk.LENGTH + y;
@@ -129,11 +128,12 @@ public class World implements IBlockAccess {
 					boolean cave = yy < height && genInfo.getCave(x, yy, z);
 					Block block = null;
 					//increase water level for chaotic world
-					int waterLevel = worldType == WorldType.Normal ? 0 : 2;
+					int waterLevel = genInfo.waterLevel;
+					int snowHeight = genInfo.snowLevel;
 					if (!cave) {
 						if (yy < height - 4) {
 							block = Block.STONE;
-						} else if (yy < height - 1 && yy < 23) {
+						} else if (yy < height - 1 && yy < snowHeight) {
 							block = Block.DIRT;
 							//blends grass -> snow
 							if (yy > 18) {
@@ -143,7 +143,7 @@ public class World implements IBlockAccess {
 									block = Block.SNOW;
 								}
 							}
-						} else if (yy < height && yy > waterLevel && yy < 23) {
+						} else if (yy < height && yy > waterLevel && yy < snowHeight) {
 							block = Block.GRASS;
 							//blends grass -> snow
 							if (yy > 18) {
@@ -155,7 +155,7 @@ public class World implements IBlockAccess {
 							}
 						} else if (yy < height && yy < waterLevel) {
 							block = Block.SAND;
-						} else if (yy < height && yy > 22) {
+						} else if (yy < height && yy > snowHeight-1) {
 							block = Block.SNOW;
 						} else if (yy < waterLevel && worldType == WorldType.Normal) {
 							block = Block.WATER;
