@@ -17,6 +17,7 @@ import io.bluestaggo.voxelthing.world.entity.Player;
 import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
+import io.bluestaggo.voxelthing.world.WorldInfo;
 
 import javax.swing.*;
 import java.io.*;
