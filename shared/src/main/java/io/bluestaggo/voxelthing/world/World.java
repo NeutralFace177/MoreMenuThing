@@ -52,9 +52,6 @@ public class World implements IBlockAccess {
 		}
 		this.worldType = type;
 		
-
-
-
 		if (saveHandler == null) {
 			saveHandler = new EmptySaveHandler();
 		}
