@@ -45,6 +45,11 @@ public class GLState implements AutoCloseable {
 		glDisable(state);
 	}
 
+	public void scissor(int x, int y, int width, int height) {
+		glScissor(x, y, width, height);
+		enable(GL_SCISSOR_TEST);
+	}
+
 	@Override
 	public void close() {
 		for (int state : enabled) {

@@ -4,7 +4,7 @@ public enum WorldType {
     Normal,
     Chaotic;
 
-    public WorldType intTWorldType(int i) {
+    public static WorldType intToWorldType(int i) {
         if (i == 1) {
             return Normal;
         } else {
@@ -12,7 +12,7 @@ public enum WorldType {
         }
     }
 
-    public int typeToInt(WorldType type) {
+    public static int typeToInt(WorldType type) {
         if (type == WorldType.Normal) {
             return 1;
         } else {

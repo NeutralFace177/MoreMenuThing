@@ -176,4 +176,8 @@ public class CompoundItem extends StructureItem {
 	public void setItem(String key, StructureItem value) {
 		map.put(key, value);
 	}
+
+	public boolean containsKey(String key) {
+		return map.containsKey(key);
+	}
 }

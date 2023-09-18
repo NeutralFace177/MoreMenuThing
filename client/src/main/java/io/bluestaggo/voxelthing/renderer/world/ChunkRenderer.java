@@ -19,7 +19,7 @@ public class ChunkRenderer {
 	private boolean empty;
 	private double firstAppearance;
 
-	private final Bindings bindings = new Bindings(VertexLayout.WORLD);
+	private Bindings bindings;
 
 	public ChunkRenderer(MainRenderer renderer, World world, int x, int y, int z) {
 		this.renderer = renderer;
@@ -63,6 +63,10 @@ public class ChunkRenderer {
 				return;
 			}
 
+			if (bindings == null) {
+				bindings = new Bindings(VertexLayout.WORLD);
+			}
+
 			IBlockAccess cache = new ChunkCache(world, x, y, z);
 			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
@@ -84,7 +88,7 @@ public class ChunkRenderer {
 	}
 
 	public void draw() {
-		if (!empty) {
+		if (!empty && bindings != null) {
 			bindings.draw();
 		}
 	}
@@ -107,6 +111,9 @@ public class ChunkRenderer {
 	}
 
 	public void unload() {
-		this.bindings.unload();
+		if (bindings != null) {
+			bindings.unload();
+			bindings = null;
+		}
 	}
 }

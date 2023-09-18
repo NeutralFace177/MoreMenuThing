@@ -10,6 +10,7 @@ import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 import io.bluestaggo.voxelthing.world.storage.EmptySaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
+import io.bluestaggo.voxelthing.world.generation.Biomes;
 import org.joml.Vector3d;
 import org.joml.Vector3i;
 
@@ -19,24 +20,41 @@ import java.util.Random;
 
 public class World implements IBlockAccess {
 	protected final ChunkStorage chunkStorage;
-	private final GenCache genCache;
+	public final GenCache genCache;
 	public final ISaveHandler saveHandler;
 	public final WorldType worldType;
 
+	
 	public final Random random = new Random();
-	public final WorldInfo info = new WorldInfo();
+	public final WorldInfo info;
 
 	public double partialTick;
 
 	public World() {
-		this(null, WorldType.Normal);
+		this(null,null, WorldType.Normal);
 	}
 
-	public World(ISaveHandler saveHandler) {
-		this(saveHandler, WorldType.Normal);
+	public World(ISaveHandler saveHandler, WorldInfo info) {
+		this(saveHandler, info,WorldType.Normal);
 	}
 
-	public World(ISaveHandler saveHandler, WorldType type) {
+
+	public World(ISaveHandler saveHandler, WorldInfo info, WorldType type) {
+		if (info == null) {
+			this.info = new WorldInfo();
+			CompoundItem data = saveHandler.loadData("world");
+			if (data != null) {
+				this.info.deserialize(data);
+			}
+		} else {
+			this.info = info;
+			this.info.type = type;
+		}
+		this.worldType = type;
+		
+
+
+
 		if (saveHandler == null) {
 			saveHandler = new EmptySaveHandler();
 		}
@@ -44,16 +62,6 @@ public class World implements IBlockAccess {
 		chunkStorage = new ChunkStorage(this);
 		genCache = new GenCache(this);
 		this.saveHandler = saveHandler;
-
-		this.worldType = type;
-
-		info.seed = random.nextLong();
-		info.type = type;
-
-		CompoundItem data = saveHandler.loadWorldData();
-		if (data != null) {
-			info.deserialize(data);
-		}
 	}
 
 	public Chunk getChunkAt(int x, int y, int z) {
@@ -115,7 +123,6 @@ public class World implements IBlockAccess {
 		genInfo.generate();
 		int vx = (int)((Math.round(cx*32/genInfo.gridDist) * 50));
 		int vz = (int)((Math.round(cz*32/genInfo.gridDist) * 50));
-		genInfo.voronoiSeedsGen(vx, vz);
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				float height = genInfo.getHeight(x, z);
@@ -127,41 +134,58 @@ public class World implements IBlockAccess {
 					int zz = cz * Chunk.LENGTH + z;
 					boolean cave = yy < height && genInfo.getCave(x, yy, z);
 					Block block = null;
+					Block topLayerBlock = Block.GRASS;
+					Block lowerLayerBlock = Block.DIRT;
+					Block snowLayerBlock = Block.SNOW;
+					if (genInfo.biomeGen(xx, zz) == Biomes.Desert) {
+						topLayerBlock = Block.SAND;
+						lowerLayerBlock = Block.SAND;
+						snowLayerBlock = Block.STONE;
+					}
+
+					if (genInfo.biomeGen(xx, zz) == Biomes.Jungle) {
+						snowLayerBlock = Block.STONE;
+					}
+					
+
 					//increase water level for chaotic world
 					int waterLevel = genInfo.waterLevel;
 					int snowHeight = genInfo.snowLevel;
+					int blend = genInfo.blendSnowLevel;
 					if (!cave) {
 						if (yy < height - 4) {
 							block = Block.STONE;
 						} else if (yy < height - 1 && yy < snowHeight) {
-							block = Block.DIRT;
+							block = lowerLayerBlock;
 							//blends grass -> snow
-							if (yy > 18) {
+							if (yy > blend) {
 								if (Math.random() > 0.5) {
-									block = Block.DIRT;
+									block = lowerLayerBlock;
 								} else {
-									block = Block.SNOW;
+									block = snowLayerBlock;
 								}
 							}
 						} else if (yy < height && yy > waterLevel && yy < snowHeight) {
-							block = Block.GRASS;
+							block = topLayerBlock;
 							//blends grass -> snow
-							if (yy > 18) {
+							if (yy > blend) {
 								if (Math.random() > 0.5) {
-									block = Block.GRASS;
+									block = topLayerBlock;
 								} else {
-									block = Block.SNOW;
+									block = snowLayerBlock;
 								}
 							}
 						} else if (yy < height && yy < waterLevel) {
 							block = Block.SAND;
 						} else if (yy < height && yy > snowHeight-1) {
-							block = Block.SNOW;
+							block = snowLayerBlock;
 						} else if (yy < waterLevel && worldType == WorldType.Normal) {
 							block = Block.WATER;
 						}
+
 						
-					if (genInfo.genTree(xx, zz) && yy == Math.round(height) && yy + 8 < cy * Chunk.LENGTH + 32) {
+						
+					if (genInfo.genTree(xx, zz, genInfo.biomeGen(xx, zz)) && yy == Math.round(height) && yy + 8 < cy * Chunk.LENGTH + 32 && yy > waterLevel && yy < snowHeight) {
 						block = Block.LOG;
 						setBlock(xx, yy+1, zz, Block.LOG);
 						setBlock(xx, yy+2, zz, Block.LOG);
@@ -230,9 +254,10 @@ public class World implements IBlockAccess {
 				}
 			}
 		}
-
+		chunk.dontSave();
 		onChunkAdded(cx, cy, cz);
 	}
+
 
 	public void loadSurroundingChunks(int cx, int cy, int cz, int radius) {
 		List<Vector3i> points = MathUtil.getSpherePoints(radius);
@@ -324,7 +349,7 @@ public class World implements IBlockAccess {
 	}
 
 	public void close() {
-		saveHandler.saveWorldData(info.serialize());
+		saveHandler.saveData("world", info.serialize());
 		chunkStorage.unloadAllChunks();
 	}
 }

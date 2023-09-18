@@ -2,7 +2,7 @@ package io.bluestaggo.voxelthing;
 
 import io.bluestaggo.pds.CompoundItem;
 import io.bluestaggo.voxelthing.assets.Texture;
-import io.bluestaggo.voxelthing.gui.*;
+import io.bluestaggo.voxelthing.gui.screen.*;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.util.OperatingSystem;
@@ -11,13 +11,12 @@ import io.bluestaggo.voxelthing.window.Window;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.ClientWorld;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.WorldInfo;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
-import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
-import io.bluestaggo.voxelthing.world.WorldInfo;
 
 import javax.swing.*;
 import java.io.*;
@@ -29,8 +28,6 @@ import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL33C.glClearColor;
-
-import org.lwjgl.glfw.Callbacks;
 
 public class Game {
 	public static final String VERSION;
@@ -89,7 +86,6 @@ public class Game {
 
 	public float mouseSensitivity = 0.25f;
 
-	private double tickCount;
 	private double tickTime;
 	private double partialTick;
 
@@ -159,15 +155,14 @@ public class Game {
 	}
 
 	public void startWorld() {
-		startWorld(null, WorldType.Normal);
+		startWorld((ISaveHandler) null, null);
 	}
 
-	public void startWorld(WorldType type) {
-		startWorld(null, type);
+	public void startWorld(ISaveHandler saveHandler) {
+		startWorld(saveHandler, null);
 	}
 
-	public void startWorld(String name, WorldType type) {
-		exitWorld();
+	public void startWorld(String name, WorldInfo worldInfo) {
 		ISaveHandler saveHandler = null;
 		if (name != null) {
 			try {
@@ -178,39 +173,32 @@ public class Game {
 			}
 		}
 
-		world = new ClientWorld(this, saveHandler);
+		startWorld(saveHandler, worldInfo);
+	}
+
+	public void startWorld(ISaveHandler saveHandler, WorldInfo worldInfo) {
+		exitWorld();
+
+		world = new ClientWorld(this, saveHandler, worldInfo);
 		saveHandler = world.saveHandler;
 		playerController = new ClientPlayerController(this);
 		player = new Player(world, playerController);
 
-		CompoundItem playerData = saveHandler.loadPlayerData();
+		CompoundItem playerData = saveHandler.loadData("player");
 		if (playerData != null) {
 			player.deserialize(playerData);
 		}
-	}
 
-	public void createWorld(String name, WorldType type) {
-		exitWorld();
-		ISaveHandler saveHandler = null;
-		if (name != null) {
-			try {
-				saveHandler = new FolderSaveHandler(worldDir.resolve(name));
-			} catch (IOException e) {
-				System.out.println("Cannot save world \"" + name + "\"! Playing without saving.");
-				e.printStackTrace();
-			}
-		}
-
-		world = new ClientWorld(this, saveHandler, type);
-		saveHandler = world.saveHandler;
-		playerController = new ClientPlayerController(this);
-		player = new Player(world, playerController);
+		currentGui = null;
+		window.grabCursor();
 	}
 
 	public void exitWorld() {
 		if (world != null) {
-			world.saveHandler.savePlayerData(player.serialize());
+			world.saveHandler.saveData("player", player.serialize());
 			world.close();
+			player = null;
+			world = null;
 		}
 	}
 
@@ -219,10 +207,13 @@ public class Game {
 	}
 
 	private void update(double delta) {
-		tickCount += delta;
 		tickTime += delta;
 
 		GuiScreen gui = currentGui != null ? currentGui : isInWorld() ? inGameGui : null;
+		if (gui == null) {
+			gui = currentGui = new MainMenu(this);
+			window.ungrabCursor();
+		}
 
 		if (gui == inGameGui) {
 			doControls();
@@ -290,7 +281,7 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_F)) {
 			int dist = renderer.worldRenderer.renderDistance;
 			if (window.isKeyDown(GLFW_KEY_LEFT_SHIFT)) {
-				if (dist < 64) {
+				if (dist < 16) {
 					dist <<= 1;
 				}
 			} else if (dist > 1) {
@@ -302,14 +293,16 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_R)) {
-			//player.posX = world.random.nextDouble(-1000.0, 1000.0);
-			//player.posY = 64.0;
+		//	player.posX = world.random.nextDouble(-1000.0, 1000.0);
+		//	player.posY = 64.0;
 		//	player.posZ = world.random.nextDouble(-1000.0, 1000.0);
-			double a = Math.cos((Math.PI/180) * player.rotYaw) * 100;
-			double b = Math.sin((Math.PI/180) * player.rotYaw) * 100;
-			player.velX = a;
-			player.velY = 0.0;
-			player.velZ = b;
+
+			//conversion factor for deg to rad
+			double cf = Math.PI/180; 
+			double speed = 25;
+			player.velX = Math.cos(cf * player.rotYaw) * Math.cos(cf * player.rotPitch) * speed;
+			player.velZ = Math.sin(cf * player.rotYaw) * Math.cos(cf * player.rotPitch) * speed;
+			player.velY = Math.sin(cf * player.rotPitch) * speed/10;
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_LEFT_BRACKET) && renderer.screen.scale > 0.0f) {
@@ -341,8 +334,7 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
-			window.toggleGrabCursor();
-			openGui(new PauseMenu(this));
+			exitWorld();
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
@@ -359,7 +351,7 @@ public class Game {
 					debugGui.draw();
 				}
 				inGameGui.draw();
-			} else if (currentGui instanceof SaveSelect != true) {
+			} else {
 				Texture bgTex = renderer.textures.getTexture("/assets/gui/background.png");
 
 				float width = renderer.screen.getWidth();
@@ -368,7 +360,8 @@ public class Game {
 				renderer.draw2D.drawQuad(Quad.shared()
 						.size(width, height)
 						.withTexture(bgTex)
-						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height));
+						.withUV(0.0f, 0.0f, width / bgTex.width, height / bgTex.height)
+				);
 			}
 
 			if (currentGui != null) {
@@ -378,8 +371,12 @@ public class Game {
 	}
 
 	public void openGui(GuiScreen gui) {
-		if (gui == null && !isInWorld()) {
-			gui = new MainMenu(this);
+		if (gui == null) {
+			if (currentGui.parent != null) {
+				gui = currentGui.parent;
+			} else if (!isInWorld()) {
+				gui = new MainMenu(this);
+			}
 		}
 
 		currentGui = gui;
@@ -404,10 +401,6 @@ public class Game {
 
 	public boolean showThirdPerson() {
 		return thirdPerson;
-	}
-
-	public double getTickCount() {
-		return tickCount;
 	}
 
 	public double getPartialTick() {

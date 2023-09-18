@@ -8,13 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FolderSaveHandler implements ISaveHandler {
-	private final Path worldFile;
-	private final Path playerFile;
+	private final Path root;
 	private final Path chunkFolder;
 
 	public FolderSaveHandler(Path root) throws IOException {
-		worldFile = root.resolve("world.dat");
-		playerFile = root.resolve("player.dat");
+		this.root = root;
 		chunkFolder = root.resolve("chunks");
 
 		Files.createDirectories(root);
@@ -26,9 +24,10 @@ public class FolderSaveHandler implements ISaveHandler {
 	}
 
 	@Override
-	public CompoundItem loadWorldData() {
+	public CompoundItem loadData(String type) {
+		Path file = root.resolve(type + ".dat");
 		try {
-			var item = StructureItem.readItemFromPath(worldFile);
+			var item = StructureItem.readItemFromPath(file);
 			if (item instanceof CompoundItem compoundItem) {
 				return compoundItem;
 			}
@@ -39,34 +38,12 @@ public class FolderSaveHandler implements ISaveHandler {
 	}
 
 	@Override
-	public void saveWorldData(CompoundItem data) {
+	public void saveData(String type, CompoundItem data) {
+		Path file = root.resolve(type + ".dat");
 		try {
-			data.writeItemToPath(worldFile);
+			data.writeItemToPath(file);
 		} catch (IOException e) {
-			System.out.println("Failed to save world data to \"" + worldFile + "\"");
-			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public CompoundItem loadPlayerData() {
-		try {
-			var item = StructureItem.readItemFromPath(playerFile);
-			if (item instanceof CompoundItem compoundItem) {
-				return compoundItem;
-			}
-			return null;
-		} catch (IOException e) {
-			return null;
-		}
-	}
-
-	@Override
-	public void savePlayerData(CompoundItem data) {
-		try {
-			data.writeItemToPath(playerFile);
-		} catch (IOException e) {
-			System.out.println("Failed to save player data to \"" + playerFile + "\"");
+			System.out.println("Failed to save world data to \"" + file + "\"");
 			e.printStackTrace();
 		}
 	}

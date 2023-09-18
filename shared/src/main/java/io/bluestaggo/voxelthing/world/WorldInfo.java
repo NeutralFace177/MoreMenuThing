@@ -1,28 +1,33 @@
 package io.bluestaggo.voxelthing.world;
 
 import io.bluestaggo.pds.CompoundItem;
-import io.bluestaggo.pds.IntItem;
-import io.bluestaggo.pds.LongItem;
 import io.bluestaggo.voxelthing.world.generation.WorldType;
 
+import java.util.Random;
+
 public class WorldInfo {
-	public long seed;
+	public String name = "world";
+	public long seed = new Random().nextLong();
 	public WorldType type;
 
 	public void deserialize(CompoundItem data) {
-		seed = data.map.get("seed").getLong();
+		
 		try {
-			type = type.intTWorldType(data.map.get("worldType").getInt());
+			name = data.getString("name");
+			seed = data.getLong("seed");
+			type = WorldType.intToWorldType(data.getInt("worldType"));
 		} catch (Exception e) {
-			// 
+			// TODO: handle exception
 		}
-
+		
 	}
 
 	public CompoundItem serialize() {
 		var data = new CompoundItem();
-		data.map.put("seed", new LongItem(seed));
-		data.map.put("worldType", new IntItem(type.typeToInt(type)));
+		data.setString("name", name);
+		data.setLong("seed", seed);
+		data.setInt("worldType", WorldType.typeToInt(type));
 		return data;
 	}
 }
+

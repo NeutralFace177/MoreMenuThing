@@ -177,6 +177,18 @@ public class Font {
 		print(text, x - getStringLength(text) * size / 2.0f, y, r, g, b, size);
 	}
 
+	public void printRight(String text, float x, float y) {
+		printRight(text, x, y, 1.0f, 1.0f, 1.0f);
+	}
+
+	public void printRight(String text, float x, float y, float r, float g, float b) {
+		printRight(text, x, y, r, g, b, 1.0f);
+	}
+
+	public void printRight(String text, float x, float y, float r, float g, float b, float size) {
+		print(text, x - getStringLength(text) * size, y, r, g, b, size);
+	}
+
 	public int getStringLength(String text) {
 		int x = 0;
 

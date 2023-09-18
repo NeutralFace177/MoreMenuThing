@@ -4,21 +4,12 @@ import io.bluestaggo.pds.CompoundItem;
 
 public class EmptySaveHandler implements ISaveHandler {
 	@Override
-	public CompoundItem loadWorldData() {
+	public CompoundItem loadData(String type) {
 		return null;
 	}
 
 	@Override
-	public void saveWorldData(CompoundItem data) {
-	}
-
-	@Override
-	public CompoundItem loadPlayerData() {
-		return null;
-	}
-
-	@Override
-	public void savePlayerData(CompoundItem data) {
+	public void saveData(String type, CompoundItem data) {
 	}
 
 	@Override

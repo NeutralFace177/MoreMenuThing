@@ -9,6 +9,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -23,10 +26,12 @@ public class Window {
 
 	private final long handle;
 	private final GLFWErrorCallback errorCallback;
-	private final GLFWFramebufferSizeCallback framebufferSizeCallback;
+	private final GLFWCharCallback charCallback;
 	private final GLFWCursorPosCallback cursorPosCallback;
+	private final GLFWFramebufferSizeCallback framebufferSizeCallback;
 	private final GLFWKeyCallback keyCallback;
 	private final GLFWMouseButtonCallback mouseButtonCallback;
+	private final GLFWScrollCallback scrollCallback;
 
 	private int width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT;
 	private double deltaTime, lastTick, fpsTimer;
@@ -34,10 +39,13 @@ public class Window {
 
 	private double mouseX, mouseY;
 	private double mouseDeltaX, mouseDeltaY;
+	private double scrollX, scrollY;
 	private boolean cursorGrabbed;
 
 	private final KeyState[] keyStates;
 	private final KeyState[] mouseStates;
+	private final Set<Character> pressedCharacters = new HashSet<>();
+	private final Set<Character> pressedCharactersImmutable = Collections.unmodifiableSet(pressedCharacters);
 
 	public Window() {
 		keyStates = Stream.generate(KeyState::new).limit(GLFW_KEY_LAST + 1).toArray(KeyState[]::new);
@@ -64,10 +72,12 @@ public class Window {
 		glViewport(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		glfwSwapInterval(LIMIT_FPS ? 1 : 0);
 
-		framebufferSizeCallback = GLFWFramebufferSizeCallback.create(this::onFramebufferSize).set(handle);
+		charCallback = GLFWCharCallback.create(this::onChar).set(handle);
 		cursorPosCallback = GLFWCursorPosCallback.create(this::onCursorPos).set(handle);
+		framebufferSizeCallback = GLFWFramebufferSizeCallback.create(this::onFramebufferSize).set(handle);
 		keyCallback = GLFWKeyCallback.create(this::onKey).set(handle);
 		mouseButtonCallback = GLFWMouseButtonCallback.create(this::onMouseButton).set(handle);
+		scrollCallback = GLFWScrollCallback.create(this::onScroll).set(handle);
 
 		try {
 			setIcon("/assets/icon.png");
@@ -86,16 +96,17 @@ public class Window {
 	public void destroy() {
 		glfwTerminate();
 		errorCallback.close();
-		framebufferSizeCallback.close();
+		charCallback.close();
 		cursorPosCallback.close();
+		framebufferSizeCallback.close();
 		keyCallback.close();
 		mouseButtonCallback.close();
+		scrollCallback.close();
 	}
 
-	private void onFramebufferSize(long handle, int width, int height) {
-		glViewport(0, 0, width, height);
-		this.width = width;
-		this.height = height;
+	private void onChar(long handle, int i) {
+		char c = (char) i;
+		pressedCharacters.add(c);
 	}
 
 	private void onCursorPos(long handle, double x, double y) {
@@ -103,6 +114,12 @@ public class Window {
 		mouseDeltaY = mouseY - y;
 		mouseX = x;
 		mouseY = y;
+	}
+
+	private void onFramebufferSize(long handle, int width, int height) {
+		glViewport(0, 0, width, height);
+		this.width = width;
+		this.height = height;
 	}
 
 	private void onKey(long handle, int key, int scancode, int action, int mods) {
@@ -115,6 +132,11 @@ public class Window {
 		mouseStates[button].setPressed(action > 0);
 	}
 
+	private void onScroll(long handle, double x, double y) {
+		this.scrollX += x;
+		this.scrollY += y;
+	}
+
 	public boolean shouldClose() {
 		return glfwWindowShouldClose(handle);
 	}
@@ -122,6 +144,8 @@ public class Window {
 	public void update() {
 		mouseDeltaX = 0.0D;
 		mouseDeltaY = 0.0D;
+		scrollX = 0.0D;
+		scrollY = 0.0D;
 
 		for (KeyState keyState : keyStates) {
 			keyState.update();
@@ -129,6 +153,7 @@ public class Window {
 		for (KeyState mouseState : mouseStates) {
 			mouseState.update();
 		}
+		pressedCharacters.clear();
 
 		glfwSwapBuffers(handle);
 		glfwPollEvents();
@@ -154,6 +179,10 @@ public class Window {
 		return height;
 	}
 
+	public double getDeltaTime() {
+		return deltaTime;
+	}
+
 	public int getFps() {
 		return finalFps;
 	}
@@ -174,8 +203,12 @@ public class Window {
 		return mouseDeltaY;
 	}
 
-	public double getDeltaTime() {
-		return deltaTime;
+	public double getScrollX() {
+		return scrollX;
+	}
+
+	public double getScrollY() {
+		return scrollY;
 	}
 
 	public void grabCursor() {
@@ -254,6 +287,10 @@ public class Window {
 				.toArray();
 	}
 
+	public Set<Character> getCharactersPressed() {
+		return pressedCharactersImmutable;
+	}
+
 	public boolean isMouseDown(int mouse) {
 		return mouseStates[mouse].isPressed();
 	}
@@ -270,9 +307,5 @@ public class Window {
 
 	public static double getTimeElapsed() {
 		return glfwGetTime();
-	}
-
-	public long getHandle() {
-		return handle;
 	}
 }

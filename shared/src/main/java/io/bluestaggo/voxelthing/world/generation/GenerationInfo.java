@@ -29,6 +29,7 @@ public class GenerationInfo {
 
 	public int waterLevel;
 	public int snowLevel = 23;
+	public int blendSnowLevel = snowLevel - 4;
 
 	public WorldType worldType;
 
@@ -57,7 +58,6 @@ public class GenerationInfo {
 		worldType = type;
 		waterLevel = worldType == WorldType.Normal ? 0 : 2;
 
-		voronoiSeedsGen(0, 0);
 		
 
 		chunkX = cx;
@@ -70,7 +70,7 @@ public class GenerationInfo {
 		}
 		hasGenerated = true;
 
-		final int baseOctaves = 4;
+		final int baseOctaves = 6;
 		final double baseScale = 300.0;
 		final float baseHeightScale = 8.0f;
 
@@ -123,30 +123,53 @@ public class GenerationInfo {
 					cliff = MathUtil.floorMod(cliffHeight, s);
 				}
 				
-				float exp = worldType == WorldType.Normal ? 0.08f : 0.15f;
-				baseHeight = baseHeight > 20 ? baseHeight + (float)Math.pow(Math.exp(baseHeight-20),exp)-1 : baseHeight;
-				baseHeight = baseHeight < waterLevel-3 ? -(float)Math.log(Math.pow(Math.abs(baseHeight), 7)) + 6 : baseHeight;
 				
 
 				if (cliff > cliffThreshold) {
 					baseHeight += cliffHeight;
 				}
 
+				float exp = worldType == WorldType.Normal ? 0.08f : 0.15f;
+				baseHeight = baseHeight > 20 ? baseHeight + (float)Math.pow(Math.exp(baseHeight-20),exp)-1 : baseHeight;
+				baseHeight = baseHeight < waterLevel-3 ? -(float)Math.log(Math.pow(Math.abs(baseHeight), 7)) + 6 : baseHeight;
+				
+
 				height[x + z * Chunk.LENGTH] = baseHeight;
 			}
 		}      
 	}
 
-	public boolean genTree(int x, int z) {
+	public boolean genTree(int x, int z,Biomes biome) {
 
 		double baseScale = 1;
+		double threshold = biome == Biomes.Forest ? 0.7 : 0.5;
+		threshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 3 : threshold;
 
 		float trees = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
-		float forest = OpenSimplex2Octaves.noise2(treeSeed2,1, x / 400, z / 400);
 
-		return trees > 0.7 && forest > 0.0;
+
+		return trees > threshold;
 	}
 
+	public Biomes biomeGen(int x, int z) {
+		float scale = 500;
+		float heat = OpenSimplex2Octaves.noise2(biomeSeed, 2, x / scale, z / scale);
+		float moist = OpenSimplex2Octaves.noise2(secondBiomeSeed, 2, x / scale, z / scale);
+
+		if (heat > 0 && moist > 0) {
+			return Biomes.Jungle;
+		} else if (heat > 0 && moist < 0) {
+			return Biomes.Desert;
+		} else if (heat < 0 && moist > 0) {
+			return Biomes.Forest;
+		} else if (heat < 0 && moist < 0) {
+			return Biomes.Plains;
+		} else {
+			return Biomes.Plains;
+		}
+	}
+
+	//im not going to use this for biomes cuz math is too much mathing
 	public void voronoiSeedsGen(int x,int z) {
 		
 		ArrayList<ArrayList<Double>> seedArray = new ArrayList<ArrayList<Double>>();
@@ -164,7 +187,7 @@ public class GenerationInfo {
 		}
 		voronoiSeeds = seedArray;
 		unModVSeeds = array;
-		System.out.println(voronoiSeeds);
+		//System.out.println(voronoiSeeds);
 	}
 
 	private long splitMix() {

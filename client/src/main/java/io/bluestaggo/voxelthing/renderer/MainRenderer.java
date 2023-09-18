@@ -2,7 +2,6 @@ package io.bluestaggo.voxelthing.renderer;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.FontManager;
-import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.assets.TextureManager;
 import io.bluestaggo.voxelthing.renderer.draw.Draw2D;
 import io.bluestaggo.voxelthing.renderer.draw.Draw3D;
@@ -112,9 +111,9 @@ public class MainRenderer {
 			setupCloudShader(viewProj);
 			skyFramebuffer.use();
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			drawSkybox();
+			worldRenderer.drawSky();
 			Framebuffer.stop();
-			drawSkybox();
+			worldRenderer.drawSky();
 
 			setupWorldShader(viewProj);
 			textures.getMipmappedTexture("/assets/blocks.png").use();
@@ -129,7 +128,8 @@ public class MainRenderer {
 				entityRenderer.renderEntity(game.player);
 			}
 
-			Texture.stop();
+			textures.getMipmappedTexture("/assets/environment/clouds.png").use();
+			worldRenderer.drawClouds();
 			Shader.stop();
 		}
 	}
@@ -139,14 +139,6 @@ public class MainRenderer {
 
 		screenShader.use();
 		screenShader.mvp.set(screen.getViewProj());
-	}
-
-	private void drawSkybox() {
-		Texture.stop();
-		worldRenderer.drawSky();
-		textures.getMipmappedTexture("/assets/environment/clouds.png").use();
-		worldRenderer.drawClouds();
-		Texture.stop();
 	}
 
 	private void setupWorldShader(Matrix4f viewProj) {
