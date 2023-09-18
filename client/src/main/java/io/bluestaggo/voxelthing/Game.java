@@ -334,7 +334,7 @@ public class Game {
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_ESCAPE)) {
-			exitWorld();
+			openGui(new PauseMenu(this));
 		}
 
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
