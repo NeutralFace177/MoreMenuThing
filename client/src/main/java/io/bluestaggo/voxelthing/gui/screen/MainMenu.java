@@ -62,7 +62,7 @@ public class MainMenu extends GuiScreen {
 				.withTexture(r.textures.getTexture("/assets/gui/titlebg.png")));
 
 		float hover = (float) Math.sin(Window.getTimeElapsed() * Math.PI);
-		r.fonts.outlined.printCentered("VOXEL THING",
+		r.fonts.outlined.printCentered("NEUTRAL THING",
 				r.screen.getWidth() / 2.0f,
 				20.0f + hover * 2.0f,
 				0.0f, 1.0f, 1.0f, 4.0f);
