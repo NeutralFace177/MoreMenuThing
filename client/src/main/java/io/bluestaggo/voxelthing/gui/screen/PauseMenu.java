@@ -1,7 +1,8 @@
-package io.bluestaggo.voxelthing.gui;
+package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.Texture;
+import io.bluestaggo.voxelthing.gui.OptionsMenu;
 import io.bluestaggo.voxelthing.gui.control.GuiControl;
 import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.renderer.GLState;

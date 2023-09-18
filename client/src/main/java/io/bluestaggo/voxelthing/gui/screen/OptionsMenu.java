@@ -1,4 +1,4 @@
-package io.bluestaggo.voxelthing.gui;
+package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.Texture;
