@@ -340,7 +340,9 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
 			openGui(new BlockInventory(this));
 		}
-		
+		if (window.isKeyJustPressed(GLFW_KEY_T)) {
+			openGui(new Chat(this));
+		}
 	}
 
 	private void draw() {
