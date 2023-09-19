@@ -340,6 +340,7 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_E)) {
 			openGui(new BlockInventory(this));
 		}
+		
 	}
 
 	private void draw() {
