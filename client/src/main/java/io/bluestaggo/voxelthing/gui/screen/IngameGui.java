@@ -9,7 +9,7 @@ import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
-import io.bluestaggo.voxelthing.world.generation.Structure;
+import io.bluestaggo.voxelthing.world.generation.blockInStructure;
 import io.bluestaggo.voxelthing.world.generation.Structures;
 
 import org.joml.Vector2i;
@@ -26,8 +26,8 @@ public class IngameGui extends GuiScreen {
 	private int[] prevHoverProgress;
 	private int[] hoverProgress;
 	private int swingTick = 0;
-	public Structure[] finalStructure = Structures.Tree1.getStructure();
-	public ArrayList<Structure> structure = new ArrayList<Structure>();
+	private boolean firstBlock = true;
+	public ArrayList<blockInStructure> structure = new ArrayList<blockInStructure>();
 
 	int sx = 0;
 	int sy = 0;
@@ -219,15 +219,37 @@ public class IngameGui extends GuiScreen {
 
 			if (button == 0) {
 				game.world.setBlock(x, y, z, null);
-				for (int i = 0; i < finalStructure.length; i++) {
-					int ox = finalStructure[i].x;
-					int oy = finalStructure[i].y;
-					int oz = finalStructure[i].z;
+				if (game.structureMode) {
 
-					game.world.setBlock(x - ox, y - oy, z - oz, finalStructure[i].block);
+					for (int i = 0; i < structure.size(); i++) {
+						if (sx-x == structure.get(i).x && sy-y == structure.get(i).y && sz-z == structure.get(i).z) {
+							structure.remove(i);
+							String a = "{";
+							for (int j = 0; j < structure.size(); j++) {
+								a += "s(";
+								a += Block.getCode(structure.get(j).block) + ", ";
+								a += structure.get(j).x + ", ";
+								a += structure.get(j).y + ", ";
+								a += structure.get(j).z;
+								a += ")";
+								a += j == structure.size()-1 ? "" : ", ";
+							}
+							a += "}";
+							System.out.println("\n" + a);
+							break;
+						}
+					}
 				}
 			} else if (button == 1) {
 				Block placedBlock = getPlacedBlock();
+
+				if (game.structurePaintMode) {
+					for (int i = 0; i < game.structureToPaint.getStructure().length; i++) {
+						game.world.setBlock(x - game.structureToPaint.getStructure()[i].x, y - game.structureToPaint.getStructure()[i].y + 1, z - game.structureToPaint.getStructure()[i].z, game.structureToPaint.getStructure()[i].block);
+					}
+				}
+
+
 				if (placedBlock != null) {
 					x += face.X;
 					y += face.Y;
@@ -235,24 +257,30 @@ public class IngameGui extends GuiScreen {
 
 					if (game.world.isAir(x, y, z)) {
 						game.world.setBlock(x, y, z, placedBlock);
-						if (game.thingy) {
-							game.thingy = false;
-							sx = x;
-							sy = y;
-							sz = z;
+						
+						if (game.structureMode) {
+							if (firstBlock) {
+								sx = x;
+								sy = y;
+								sz = z;
+								firstBlock = false;
+							}
+
+							structure.add(s(placedBlock, sx - x, sy - y, sz - z));
+							String a = "{";
+							for (int i = 0; i < structure.size(); i++) {
+								a += "s(";
+								a += Block.getCode(structure.get(i).block) + ", ";
+								a += structure.get(i).x + ", ";
+								a += structure.get(i).y + ", ";
+								a += structure.get(i).z;
+								a += ")";
+								a += i == structure.size()-1 ? "" : ", ";
+							}
+							a += "}";
+							System.out.println("\n" + a);
 						}
-						structure.add(s(placedBlock, sx - x, sy - y, sz - z));
-						String a = "{";
-						for (int i = 0; i < structure.size(); i++) {
-							a += "s(";
-							a += Block.getCode(structure.get(i).block) + ", ";
-							a += structure.get(i).x + ", ";
-							a += structure.get(i).y + ", ";
-							a += structure.get(i).z;
-							a += "), ";
-						}
-						a += "}";
-						System.out.println(a);
+						
 						swingTick = 10;
 					}
 				}
@@ -266,7 +294,7 @@ public class IngameGui extends GuiScreen {
 
 
 	//shorter way of new Structure
-	public static Structure s(Block block, int x, int y, int z) {
-		return new Structure(block, x, y, z);
+	public static blockInStructure s(Block block, int x, int y, int z) {
+		return new blockInStructure(block, x, y, z);
 	}
 }

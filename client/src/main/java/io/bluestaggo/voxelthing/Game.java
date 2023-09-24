@@ -15,6 +15,7 @@ import io.bluestaggo.voxelthing.world.WorldInfo;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.entity.IPlayerController;
 import io.bluestaggo.voxelthing.world.entity.Player;
+import io.bluestaggo.voxelthing.world.generation.Structures;
 import io.bluestaggo.voxelthing.world.storage.FolderSaveHandler;
 import io.bluestaggo.voxelthing.world.storage.ISaveHandler;
 
@@ -27,6 +28,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.opengl.GL11C.glClearColor;
 import static org.lwjgl.opengl.GL33C.glClearColor;
 
 public class Game {
@@ -34,7 +36,9 @@ public class Game {
 	public static final int TICKS_PER_SECOND = 20;
 	public static final float TICK_RATE = 1.0f / TICKS_PER_SECOND;
 
-	public boolean thingy = false;
+	public boolean structureMode = false;
+	public boolean structurePaintMode = false;
+	public Structures structureToPaint = Structures.House;
 
 	static {
 		String version = "???";
@@ -265,7 +269,8 @@ public class Game {
 			renderer.camera.setRotation(yaw, pitch);
 
 			if (world != null) {
-				blockRaycast = renderer.camera.getRaycast(256.0f);
+				float length = structurePaintMode == true ? 512 : 10;
+				blockRaycast = renderer.camera.getRaycast(length);
 				world.doRaycast(blockRaycast);
 			}
 

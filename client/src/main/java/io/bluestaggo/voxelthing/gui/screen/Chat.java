@@ -2,6 +2,7 @@ package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.gui.control.TextBox;
+import io.bluestaggo.voxelthing.world.generation.Structures;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -40,8 +41,17 @@ public class Chat extends GuiScreen {
         
         try {
 
-            if (chatBox.text.substring(0, 5).equals("start")) {
-                Game.getInstance().thingy = true;
+            if (chatBox.text.equals("struct")) {
+                game.structureMode = true;
+                game.structurePaintMode = false;
+            }
+            if (chatBox.text.substring(0, 5).equals("paint")) {
+                game.structureMode = false;
+                game.structurePaintMode = true;
+            }
+            if (chatBox.text.equals("normal")) {
+                game.structureMode = false;
+                game.structurePaintMode = false;
             }
         } catch (Exception e) {
 
