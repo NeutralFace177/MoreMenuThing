@@ -10,7 +10,7 @@ uniform vec3 camPos;
 uniform vec4 uvRange;
 uniform float ticks;
 
-uniform float cloudHeight = 96.5;
+uniform float cloudHeight = 128f;
 
 void main() {
     vec3 worldPos = (camPos * vec3(1.0, 0.0, 1.0)) + vec3(-512.0, cloudHeight, -512.0);

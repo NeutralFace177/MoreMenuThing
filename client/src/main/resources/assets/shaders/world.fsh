@@ -1,6 +1,6 @@
 #version 330 core
 
-#define PI 3.14159265359
+#define PI 3.14159265358979323
 
 in vec3 pos;
 in vec3 color;
