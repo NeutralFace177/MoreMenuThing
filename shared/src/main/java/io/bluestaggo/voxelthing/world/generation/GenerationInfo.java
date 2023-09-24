@@ -139,16 +139,21 @@ public class GenerationInfo {
 		}      
 	}
 
-	public boolean genTree(int x, int z,Biomes biome) {
+	public int genTree(int x, int z,Biomes biome) {
 
 		double baseScale = 1;
 		double threshold = biome == Biomes.Forest ? 0.7 : 0.5;
-		threshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 3 : threshold;
+		threshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 8008135 : threshold;
+
+		double largeThreshold = biome == Biomes.Forest ? 0.8 : 0.8;
+		largeThreshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 102496 : largeThreshold; 
 
 		float trees = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
 
+		int n = largeThreshold > trees && trees > threshold ? 1 : 0;
+		n = trees >= largeThreshold ? 2 : n;
 
-		return trees > threshold;
+		return n;
 	}
 
 	public Biomes biomeGen(int x, int z) {

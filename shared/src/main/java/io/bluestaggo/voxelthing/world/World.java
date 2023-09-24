@@ -6,6 +6,7 @@ import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.GenCache;
 import io.bluestaggo.voxelthing.world.generation.GenerationInfo;
+import io.bluestaggo.voxelthing.world.generation.Structures;
 import io.bluestaggo.voxelthing.world.generation.WorldType;
 import io.bluestaggo.voxelthing.world.storage.ChunkStorage;
 import io.bluestaggo.voxelthing.world.storage.EmptySaveHandler;
@@ -118,8 +119,6 @@ public class World implements IBlockAccess {
 
 
 		genInfo.generate();
-		int vx = (int)((Math.round(cx*32/genInfo.gridDist) * 50));
-		int vz = (int)((Math.round(cz*32/genInfo.gridDist) * 50));
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				float height = genInfo.getHeight(x, z);
@@ -182,63 +181,18 @@ public class World implements IBlockAccess {
 
 						
 						
-					if (genInfo.genTree(xx, zz, genInfo.biomeGen(xx, zz)) && yy == Math.round(height) && yy + 8 < cy * Chunk.LENGTH + 32 && yy > waterLevel && yy < snowHeight) {
-						block = Block.LOG;
-						setBlock(xx, yy+1, zz, Block.LOG);
-						setBlock(xx, yy+2, zz, Block.LOG);
-						setBlock(xx, yy+3, zz, Block.LOG);
-
-						setBlock(xx+1, yy+3, zz, Block.LEAVES);
-						setBlock(xx-1, yy+3, zz, Block.LEAVES);
-						setBlock(xx, yy+3, zz+1, Block.LEAVES);
-						setBlock(xx, yy+3, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+3, zz+1, Block.LEAVES);
-						setBlock(xx-1, yy+3, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+3, zz-1, Block.LEAVES);
-						setBlock(xx-1, yy+3, zz+1, Block.LEAVES);
-						setBlock(xx+2, yy+3, zz, Block.LEAVES);
-						setBlock(xx-2, yy+3, zz, Block.LEAVES);
-						setBlock(xx, yy+3, zz-2, Block.LEAVES);
-						setBlock(xx, yy+3, zz+2, Block.LEAVES);
-
-						setBlock(xx+1, yy+4, zz, Block.LEAVES);
-						setBlock(xx-1, yy+4, zz, Block.LEAVES);
-						setBlock(xx, yy+4, zz+1, Block.LEAVES);
-						setBlock(xx, yy+4, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+4, zz+1, Block.LEAVES);
-						setBlock(xx-1, yy+4, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+4, zz-1, Block.LEAVES);
-						setBlock(xx-1, yy+4, zz+1, Block.LEAVES);
-						setBlock(xx+2, yy+4, zz, Block.LEAVES);
-						setBlock(xx-2, yy+4, zz, Block.LEAVES);
-						setBlock(xx, yy+4, zz-2, Block.LEAVES);
-						setBlock(xx, yy+4, zz+2, Block.LEAVES);
-						setBlock(xx, yy+4, zz, Block.LEAVES);
-
-						setBlock(xx+1, yy+5, zz, Block.LEAVES);
-						setBlock(xx-1, yy+5, zz, Block.LEAVES);
-						setBlock(xx, yy+5, zz+1, Block.LEAVES);
-						setBlock(xx, yy+5, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+5, zz+1, Block.LEAVES);
-						setBlock(xx-1, yy+5, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+5, zz-1, Block.LEAVES);
-						setBlock(xx-1, yy+5, zz+1, Block.LEAVES);
-						setBlock(xx, yy+5, zz, Block.LEAVES);
-
-						setBlock(xx+1, yy+6, zz, Block.LEAVES);
-						setBlock(xx-1, yy+6, zz, Block.LEAVES);
-						setBlock(xx, yy+6, zz+1, Block.LEAVES);
-						setBlock(xx, yy+6, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+6, zz+1, Block.LEAVES);
-						setBlock(xx-1, yy+6, zz-1, Block.LEAVES);
-						setBlock(xx+1, yy+6, zz-1, Block.LEAVES);
-						setBlock(xx-1, yy+6, zz+1, Block.LEAVES);
-						setBlock(xx, yy+6, zz, Block.LEAVES);
-
-						setBlock(xx, yy+7, zz, Block.LEAVES);
-						setBlock(xx, yy+8, zz, Block.LEAVES);
-
-
+					if (genInfo.genTree(xx, zz, genInfo.biomeGen(xx, zz)) != 0 && yy == Math.round(height) && yy > waterLevel && yy < snowHeight) {
+						loadChunkAt(cx, cy+1, cz);
+						if (genInfo.genTree(xx, zz, genInfo.biomeGen(xx, zz)) == 1) {
+							for (int i = 0; i < Structures.SmallTree.getStructure().length; i++) {
+								setBlock(xx - Structures.SmallTree.getStructure()[i].x, yy - Structures.SmallTree.getStructure()[i].y, zz - Structures.SmallTree.getStructure()[i].z, Structures.SmallTree.getStructure()[i].block);
+							}
+						}
+						if (genInfo.genTree(xx, zz, genInfo.biomeGen(xx, zz)) == 2) {
+							for (int i = 0; i < Structures.LargeTree.getStructure().length; i++) {
+								setBlock(xx - Structures.LargeTree.getStructure()[i].x, yy - Structures.LargeTree.getStructure()[i].y, zz - Structures.LargeTree.getStructure()[i].z, Structures.LargeTree.getStructure()[i].block);
+							}
+						}
 
 						if (getBlock(xx, yy-1, zz) == null) {
 							setBlock(xx, yy-1, zz, Block.LOG);
