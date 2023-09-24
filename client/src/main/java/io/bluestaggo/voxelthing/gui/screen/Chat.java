@@ -37,15 +37,14 @@ public class Chat extends GuiScreen {
     }
 
     public void command() {
-        char[] chars = {};
-        char[] start = "start".toCharArray();
+        
         try {
-            chatBox.text.getChars(0, 1, chars, 0);
-            if (chars == start) {
-                
-        }
+
+            if (chatBox.text.substring(0, 5).equals("start")) {
+                Game.getInstance().thingy = true;
+            }
         } catch (Exception e) {
-            // TODO: handle exception
+
         }
     }
 

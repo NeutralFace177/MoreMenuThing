@@ -94,6 +94,21 @@ public class Block {
 		return null;
 	}
 
+	public static String getCode(Block block) {
+		if (block.id.name.contains("WOOL") || block.id.name.contains("wool")) {
+			for (int i = 0; i < WOOL_NAMES.length; i++) {
+				String name = block.id.name.substring(5, block.id.name.length());
+				if (WOOL_NAMES[i].equals(name)) {
+					return "Block.WOOL[" + i + "]";
+					
+				}
+			}
+		}
+		return "Block." +  block.id.name.toUpperCase();
+
+
+	}
+
 	public final Identifier getId() {
 		return id;
 	}

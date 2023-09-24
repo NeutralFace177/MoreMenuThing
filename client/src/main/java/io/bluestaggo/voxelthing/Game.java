@@ -34,6 +34,8 @@ public class Game {
 	public static final int TICKS_PER_SECOND = 20;
 	public static final float TICK_RATE = 1.0f / TICKS_PER_SECOND;
 
+	public boolean thingy = false;
+
 	static {
 		String version = "???";
 
@@ -263,7 +265,7 @@ public class Game {
 			renderer.camera.setRotation(yaw, pitch);
 
 			if (world != null) {
-				blockRaycast = renderer.camera.getRaycast(5.0f);
+				blockRaycast = renderer.camera.getRaycast(256.0f);
 				world.doRaycast(blockRaycast);
 			}
 

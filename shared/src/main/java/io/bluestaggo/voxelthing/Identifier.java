@@ -21,6 +21,12 @@ public class Identifier {
 		this.fullName = namespace + ":" + name;
 	}
 
+	public Identifier(String name, Object o) {
+		this.name = name;
+		this.namespace = "vt";
+		this.fullName = name;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

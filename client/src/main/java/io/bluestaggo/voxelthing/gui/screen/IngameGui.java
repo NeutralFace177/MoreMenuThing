@@ -1,6 +1,7 @@
 package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
+import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
@@ -8,14 +9,29 @@ import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.generation.Structure;
+import io.bluestaggo.voxelthing.world.generation.Structures;
+
 import org.joml.Vector2i;
+import org.lwjgl.system.Struct;
 
 import static org.lwjgl.glfw.GLFW.*;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class IngameGui extends GuiScreen {
 	private int[] prevHoverProgress;
 	private int[] hoverProgress;
 	private int swingTick = 0;
+	public Structure[] finalStructure = Structures.Tree1.getStructure();
+	public ArrayList<Structure> structure = new ArrayList<Structure>();
+
+	int sx = 0;
+	int sy = 0;
+	int sz = 0;
 
 	public IngameGui(Game game) {
 		super(game);
@@ -192,6 +208,8 @@ public class IngameGui extends GuiScreen {
 	protected void onMouseClicked(int button, int mx, int my) {
 		super.onMouseClicked(button, mx, my);
 
+
+
 		BlockRaycast raycast = game.getBlockRaycast();
 		if (raycast.blockHit()) {
 			int x = raycast.getHitX();
@@ -201,6 +219,13 @@ public class IngameGui extends GuiScreen {
 
 			if (button == 0) {
 				game.world.setBlock(x, y, z, null);
+				for (int i = 0; i < finalStructure.length; i++) {
+					int ox = finalStructure[i].x;
+					int oy = finalStructure[i].y;
+					int oz = finalStructure[i].z;
+
+					game.world.setBlock(x - ox, y - oy, z - oz, finalStructure[i].block);
+				}
 			} else if (button == 1) {
 				Block placedBlock = getPlacedBlock();
 				if (placedBlock != null) {
@@ -210,6 +235,24 @@ public class IngameGui extends GuiScreen {
 
 					if (game.world.isAir(x, y, z)) {
 						game.world.setBlock(x, y, z, placedBlock);
+						if (game.thingy) {
+							game.thingy = false;
+							sx = x;
+							sy = y;
+							sz = z;
+						}
+						structure.add(s(placedBlock, sx - x, sy - y, sz - z));
+						String a = "{";
+						for (int i = 0; i < structure.size(); i++) {
+							a += "s(";
+							a += Block.getCode(structure.get(i).block) + ", ";
+							a += structure.get(i).x + ", ";
+							a += structure.get(i).y + ", ";
+							a += structure.get(i).z;
+							a += "), ";
+						}
+						a += "}";
+						System.out.println(a);
 						swingTick = 10;
 					}
 				}
@@ -219,5 +262,11 @@ public class IngameGui extends GuiScreen {
 		if (button == 0) {
 			swingTick = 10;
 		}
+	}
+
+
+	//shorter way of new Structure
+	public static Structure s(Block block, int x, int y, int z) {
+		return new Structure(block, x, y, z);
 	}
 }
