@@ -175,6 +175,7 @@ public class GenerationInfo {
 	}
 
 	//im not going to use this for biomes cuz math is too much mathing
+	/*
 	public void voronoiSeedsGen(int x,int z) {
 		
 		ArrayList<ArrayList<Double>> seedArray = new ArrayList<ArrayList<Double>>();
@@ -194,7 +195,7 @@ public class GenerationInfo {
 		unModVSeeds = array;
 		//System.out.println(voronoiSeeds);
 	}
-
+*/
 	private long splitMix() {
 		long z = (randSeed += 0x9e3779b97f4a7c15L);
 	    z = (z ^ (z >>> 30)) * 0xbf58476d1ce4e5b9L;
