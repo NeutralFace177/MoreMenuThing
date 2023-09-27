@@ -230,6 +230,17 @@ public class GenerationInfo {
 		return biomes[x + z * Chunk.LENGTH];
 	}
 
+	public String returnStringBiome(double x, double z) {
+		int xx = (int) x / Chunk.LENGTH;
+		int zz = (int) z / Chunk.LENGTH;
+		try {
+			return getBiome(xx, zz).toString();
+		} catch (IndexOutOfBoundsException e) {
+			return "Depths Of Hell";
+		}
+
+	}
+
 	public float getTree(int x, int z) {
 		return trees[x + z * Chunk.LENGTH];
 	}

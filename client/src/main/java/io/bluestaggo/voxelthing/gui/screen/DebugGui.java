@@ -5,6 +5,7 @@ import io.bluestaggo.voxelthing.assets.FontManager;
 import io.bluestaggo.voxelthing.renderer.screen.Screen;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.generation.Biomes;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
 
 public class DebugGui extends GuiScreen {
 	public DebugGui(Game game) {
@@ -23,14 +24,7 @@ public class DebugGui extends GuiScreen {
 		long freeMB = Runtime.getRuntime().freeMemory() / 1000000L;
 		long totalMB = Runtime.getRuntime().totalMemory() / 1000000L;
 		long maxMB = Runtime.getRuntime().maxMemory() / 1000000L;
-		//Biomes biome = Biomes.Plains;
-	//	String sBiome;
 
-	//	if (biome == null) {
-	//		sBiome = "Depths Of Hell";
-	//	} else {
-	//		sBiome = biome.toString();
-	//	}
 		String[] lines = {
 				"FPS", game.window.getFps() + " (" + (int)(game.window.getDeltaTime() * 1000.0D) + "ms)",
 				"Memory", (totalMB - freeMB) + " / " + maxMB + " MB",
@@ -42,7 +36,7 @@ public class DebugGui extends GuiScreen {
 						+ ", " + formatDouble(game.player.posZ)
 						: "N/A",
 				"Looking At", game.getBlockRaycast().getDebugText(game.world),
-			//	"Biome: ",sBiome,
+				"Biome: ",game.world.genCache.getGenerationAt((int)game.player.posX / Chunk.LENGTH,(int)game.player.posZ / Chunk.LENGTH, game.world.worldType).returnStringBiome(game.player.posX, game.player.posZ),
 				"Scroll", formatDouble(game.window.getScrollX()) + ", " + formatDouble(game.window.getScrollY())
 		};
 
