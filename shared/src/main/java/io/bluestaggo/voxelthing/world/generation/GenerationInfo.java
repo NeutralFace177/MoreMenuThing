@@ -37,6 +37,10 @@ public class GenerationInfo {
 	public int gridDist = 50;
 
 	private final float[] height = new float[Chunk.AREA];
+
+	private final Biomes[] biomes = new Biomes[Chunk.AREA];
+
+	private final float[] trees = new float[Chunk.AREA];
 	private final float[] caveInfo = new float[LERP_MAP_SIZE];
 	private int lastQueryLayer = Integer.MAX_VALUE;
 
@@ -156,21 +160,29 @@ public class GenerationInfo {
 		return n;
 	}
 
-	public Biomes biomeGen(int x, int z) {
-		float scale = 500;
-		float heat = OpenSimplex2Octaves.noise2(biomeSeed, 2, x / scale, z / scale);
-		float moist = OpenSimplex2Octaves.noise2(secondBiomeSeed, 2, x / scale, z / scale);
+	public Biomes biomeGen() {
+		for (int x = 0; x < Chunk.LENGTH; x++) {
+			for (int z = 0; z < Chunk.LENGTH; z++) {
 
-		if (heat > 0 && moist > 0) {
-			return Biomes.Jungle;
-		} else if (heat > 0 && moist < 0) {
-			return Biomes.Desert;
-		} else if (heat < 0 && moist > 0) {
-			return Biomes.Forest;
-		} else if (heat < 0 && moist < 0) {
-			return Biomes.Plains;
-		} else {
-			return Biomes.Plains;
+				int xx = (chunkX * Chunk.LENGTH + x);
+				int zz = (chunkZ * Chunk.LENGTH + z);
+
+				float scale = 500;
+				float heat = OpenSimplex2Octaves.noise2(biomeSeed, 2, xx / scale, zz / scale);
+				float moist = OpenSimplex2Octaves.noise2(secondBiomeSeed, 2, xx / scale, zz / scale);
+
+				if (heat > 0 && moist > 0) {
+					return Biomes.Jungle;
+				} else if (heat > 0 && moist < 0) {
+					return Biomes.Desert;
+				} else if (heat < 0 && moist > 0) {
+					return Biomes.Forest;
+				} else if (heat < 0 && moist < 0) {
+					return Biomes.Plains;
+				} else {
+					return Biomes.Plains;
+				}
+			}
 		}
 	}
 
