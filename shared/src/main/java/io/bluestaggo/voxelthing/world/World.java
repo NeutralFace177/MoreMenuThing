@@ -119,9 +119,13 @@ public class World implements IBlockAccess {
 
 
 		genInfo.generate();
+		genInfo.biomeGen();
+		genInfo.treeGen();
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				float height = genInfo.getHeight(x, z);
+				Biomes biome = genInfo.getBiome(x, z);
+				float trees = genInfo.getTree(x, z);
 
 				
 				for (int y = 0; y < Chunk.LENGTH; y++) {
@@ -133,7 +137,7 @@ public class World implements IBlockAccess {
 					Block topLayerBlock = Block.GRASS;
 					Block lowerLayerBlock = Block.DIRT;
 					Block snowLayerBlock = Block.SNOW;
-					Biomes biome = genInfo.biomeGen(xx, zz);
+
 					if (biome == Biomes.Desert) {
 						topLayerBlock = Block.SAND;
 						lowerLayerBlock = Block.SAND;
@@ -181,14 +185,14 @@ public class World implements IBlockAccess {
 						}
 
 
-					if (genInfo.genTree(xx, zz, biome) != 0 && yy == Math.round(height) && yy > waterLevel && yy < snowHeight) {
+					if (trees != 0 && yy == Math.round(height) && yy > waterLevel && yy < snowHeight) {
 						//getOrLoadChunkAt(cx, cy+1, cz);
-						if (genInfo.genTree(xx, zz, biome) == 1) {
+						if (trees == 1) {
 							for (int i = 0; i < Structures.SmallTree.getStructure().length; i++) {
 								setBlock(xx - Structures.SmallTree.getStructure()[i].x, yy - Structures.SmallTree.getStructure()[i].y, zz - Structures.SmallTree.getStructure()[i].z, Structures.SmallTree.getStructure()[i].block);
 							}
 						}
-						if (genInfo.genTree(xx, zz, biome) == 2) {
+						if (trees == 2) {
 							for (int i = 0; i < Structures.LargeTree.getStructure().length; i++) {
 								setBlock(xx - Structures.LargeTree.getStructure()[i].x, yy - Structures.LargeTree.getStructure()[i].y, zz - Structures.LargeTree.getStructure()[i].z, Structures.LargeTree.getStructure()[i].block);
 							}

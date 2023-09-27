@@ -143,24 +143,31 @@ public class GenerationInfo {
 		}      
 	}
 
-	public int genTree(int x, int z,Biomes biome) {
+	public void treeGen() {
+		for (int x = 0; x < Chunk.LENGTH; x++) {
+			for (int z = 0; z < Chunk.LENGTH; z++) {
+				int xx = (chunkX * Chunk.LENGTH + x);
+				int zz = (chunkZ * Chunk.LENGTH + z);
+				Biomes biome = getBiome(x, z);
 
-		double baseScale = 1;
-		double threshold = biome == Biomes.Forest ? 0.7 : 0.5;
-		threshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 8008135 : threshold;
+				double baseScale = 1;
+				double threshold = biome == Biomes.Forest ? 0.7 : 0.5;
+				threshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 8008135 : threshold;
 
-		double largeThreshold = biome == Biomes.Forest ? 0.8 : 0.8;
-		largeThreshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 102496 : largeThreshold; 
+				double largeThreshold = biome == Biomes.Forest ? 0.8 : 0.8;
+				largeThreshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 102496 : largeThreshold;
 
-		float trees = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
+				float tree = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
 
-		int n = largeThreshold > trees && trees > threshold ? 1 : 0;
-		n = trees >= largeThreshold ? 2 : n;
+				int n = largeThreshold > tree && tree > threshold ? 1 : 0;
+				n = tree >= largeThreshold ? 2 : n;
 
-		return n;
+				trees[x + z * Chunk.LENGTH] = n;
+			}
+		}
 	}
 
-	public Biomes biomeGen() {
+	public void biomeGen() {
 		for (int x = 0; x < Chunk.LENGTH; x++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 
@@ -172,15 +179,15 @@ public class GenerationInfo {
 				float moist = OpenSimplex2Octaves.noise2(secondBiomeSeed, 2, xx / scale, zz / scale);
 
 				if (heat > 0 && moist > 0) {
-					return Biomes.Jungle;
+					biomes[x + z * Chunk.LENGTH] =  Biomes.Jungle;
 				} else if (heat > 0 && moist < 0) {
-					return Biomes.Desert;
+					biomes[x + z * Chunk.LENGTH] =  Biomes.Desert;
 				} else if (heat < 0 && moist > 0) {
-					return Biomes.Forest;
+					biomes[x + z * Chunk.LENGTH] =  Biomes.Forest;
 				} else if (heat < 0 && moist < 0) {
-					return Biomes.Plains;
+					biomes[x + z * Chunk.LENGTH] =  Biomes.Plains;
 				} else {
-					return Biomes.Plains;
+					biomes[x + z * Chunk.LENGTH] =  Biomes.Plains;
 				}
 			}
 		}
@@ -218,6 +225,15 @@ public class GenerationInfo {
 	public float getHeight(int x, int z) {
 		return height[x + z * Chunk.LENGTH];
 	}
+
+	public Biomes getBiome(int x, int z) {
+		return biomes[x + z * Chunk.LENGTH];
+	}
+
+	public float getTree(int x, int z) {
+		return trees[x + z * Chunk.LENGTH];
+	}
+
 
 	public boolean getCave(int x, int y, int z) {
 		if (lastQueryLayer != y >> Chunk.SIZE_POW2) {
