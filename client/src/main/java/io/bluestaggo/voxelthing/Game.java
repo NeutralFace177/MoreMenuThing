@@ -95,6 +95,7 @@ public class Game {
 	private double tickTime;
 	private double partialTick;
 
+
 	public Game() {
 		instance = this;
 
