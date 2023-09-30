@@ -2,6 +2,8 @@ package io.bluestaggo.voxelthing.gui.screen;
 
 import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.assets.Texture;
+import io.bluestaggo.voxelthing.gui.control.GuiControl;
+import io.bluestaggo.voxelthing.gui.control.LabeledButton;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
@@ -16,8 +18,25 @@ public class BlockInventory extends GuiScreen {
 	private static final int ROWS = 10;
 	private static final int COLUMNS = 5;
 
+	private final GuiControl blockTab;
+	private final GuiControl slabTab;
+
+	private int tab = 1;
+
 	public BlockInventory(Game game) {
 		super(game);
+		blockTab = addControl(new LabeledButton(this)
+				.withText("Blocks")
+				.at(-70, 0)
+				.size(40.0f, 20.0f)
+				.alignedAt(0.5f, 0.125f)
+		);
+		slabTab = addControl(new LabeledButton(this)
+				.withText("Slabs")
+				.at(30, 0)
+				.size(40.0f, 20.0f)
+				.alignedAt(0.5f, 0.125f)
+		);
 	}
 
 	@Override
@@ -62,24 +81,48 @@ public class BlockInventory extends GuiScreen {
 				r.draw2D.drawQuad(hotbarQuad.at(slotX, slotY));
 
 				int i = x + y * ROWS;
-				if (i < Block.REGISTERED_BLOCKS_ORDERED.size()) {
-					Block block = Block.REGISTERED_BLOCKS_ORDERED.get(i);
-					if (block != null) {
-						Vector2i texture = block.getTexture().get(Direction.NORTH);
+				if (tab == 1) {
+					if (i < Block.REGISTERED_BLOCKS_ORDERED.size() - Block.REGISTERED_SLABS_ORDERED.size()) {
+						Block block = Block.REGISTERED_BLOCKS_ORDERED.get(i);
+						if (block != null) {
+							Vector2i texture = block.getTexture().get(Direction.NORTH);
 
-						float minU = blocksTexture.uCoord(texture.x * 16);
-						float minV = blocksTexture.vCoord(texture.y * 16);
-						float maxU = minU + blocksTexture.uCoord(16);
-						float maxV = minV + blocksTexture.vCoord(16);
+							float minU = blocksTexture.uCoord(texture.x * 16);
+							float minV = blocksTexture.vCoord(texture.y * 16);
+							float maxU = minU + blocksTexture.uCoord(16);
+							float maxV = minV + blocksTexture.vCoord(16);
 
-						r.draw2D.drawQuad(blockQuad
-								.at(slotX + blockOffX, slotY + blockOffY)
-								.withUV(minU, minV, maxU, maxV)
-						);
+							r.draw2D.drawQuad(blockQuad
+									.at(slotX + blockOffX, slotY + blockOffY)
+									.withUV(minU, minV, maxU, maxV)
+							);
+						}
+					}
+				} else {
+					if (i < Block.REGISTERED_SLABS_ORDERED.size()) {
+						Block block = Block.REGISTERED_SLABS_ORDERED.get(i);
+						if (block != null) {
+							Vector2i texture = block.getTexture().get(Direction.NORTH);
+
+							float minU = blocksTexture.uCoord(texture.x * 16);
+							float minV = blocksTexture.vCoord(texture.y * 16);
+							float maxU = minU + blocksTexture.uCoord(16);
+							float maxV = minV + blocksTexture.vCoord(8);
+
+							r.draw2D.drawQuad(blockQuad
+									.at(slotX + blockOffX, slotY + blockOffY + 8)
+									.withUV(minU, minV, maxU, maxV)
+									.size(16,8)
+							);
+
+						}
 					}
 				}
+
 			}
 		}
+		slabTab.draw();
+		blockTab.draw();
 	}
 
 	@Override
@@ -98,6 +141,16 @@ public class BlockInventory extends GuiScreen {
 
 		if (newIndex >= 0 && newIndex < game.palette.length) {
 			game.heldItem = newIndex;
+		}
+	}
+
+	@Override
+	public void onControlClicked(GuiControl control, int button) {
+		if (control == blockTab) {
+			tab = 1;
+		}
+		if (control == slabTab) {
+			tab = 2;
 		}
 	}
 
@@ -121,12 +174,19 @@ public class BlockInventory extends GuiScreen {
 				if (mx > slotX + blockOffX && mx < slotX + slotWidth - blockOffX
 						&& my > slotY + blockOffY && my < slotY + slotHeight - blockOffY) {
 					int i = x + y * ROWS;
-					Block block = i < Block.REGISTERED_BLOCKS_ORDERED.size() ? Block.REGISTERED_BLOCKS_ORDERED.get(i) : null;
+					Block block = Block.STONE;
+					if (tab == 1) {
+						block = (i < Block.REGISTERED_BLOCKS_ORDERED.size() && tab == 1) ? Block.REGISTERED_BLOCKS_ORDERED.get(i) : null;
+					}
+					if (tab == 2) {
+						block = Block.REGISTERED_SLABS_ORDERED.get(i);
+					}
+
 					game.palette[game.heldItem] = block;
 				}
 			}
 		}
 
-		game.closeGui();
+		//game.closeGui();
 	}
 }

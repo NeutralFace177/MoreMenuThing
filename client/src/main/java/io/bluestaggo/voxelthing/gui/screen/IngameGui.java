@@ -27,7 +27,7 @@ public class IngameGui extends GuiScreen {
 	private int[] hoverProgress;
 	private int swingTick = 0;
 	private boolean firstBlock = true;
-	public ArrayList<blockInStructure> structure = new ArrayList<blockInStructure>();
+	public ArrayList<blockInStructure> structure = new ArrayList<>();
 
 	int sx = 0;
 	int sy = 0;
@@ -167,6 +167,10 @@ public class IngameGui extends GuiScreen {
 				.at(startX + (slotWidth - 16) / 2.0f, startY + (slotHeight - 16) / 2.0f)
 				.size(16, 16)
 				.withTexture(blocksTexture);
+		var halfQuad = new Quad()
+				.at(startX + (slotWidth - 16) / 2.0f, startY + slotHeight / 2.0f)
+				.size(16, 8)
+				.withTexture(blocksTexture);
 
 		for (int i = 0; i < game.palette.length; i++) {
 			Block block = game.palette[i];
@@ -177,19 +181,26 @@ public class IngameGui extends GuiScreen {
 
 			hotbarQuad.offset(0, -hover);
 			blockQuad.offset(0, -hover);
+			halfQuad.offset(0, -hover);
 
 			float slotOffset = i == game.heldItem ? 0.5f : 0.0f;
 			r.draw2D.drawQuad(hotbarQuad.withUV(slotOffset, 0.0f, 0.5f + slotOffset, 1.0f));
 
 			if (block != null) {
 				Vector2i texture = block.getTexture().get(Direction.NORTH);
+				boolean slab = Block.REGISTERED_SLABS_ORDERED.contains(block);
 
 				float minU = blocksTexture.uCoord(texture.x * 16);
 				float minV = blocksTexture.vCoord(texture.y * 16);
 				float maxU = minU + blocksTexture.uCoord(16);
-				float maxV = minV + blocksTexture.vCoord(16);
+				float maxV = slab ? minV + blocksTexture.vCoord(8) : minV + blocksTexture.vCoord(16);
 
-				r.draw2D.drawQuad(blockQuad.withUV(minU, minV, maxU, maxV));
+				if (slab) {
+					r.draw2D.drawQuad(halfQuad.withUV(minU, minV, maxU, maxV));
+				} else {
+					r.draw2D.drawQuad(blockQuad.withUV(minU, minV, maxU, maxV));
+				}
+
 			}
 
 			hotbarQuad.offset(slotWidth, hover);

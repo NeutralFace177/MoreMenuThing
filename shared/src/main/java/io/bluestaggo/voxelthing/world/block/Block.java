@@ -21,6 +21,11 @@ public class Block {
 	private static final Map<Identifier, Block> REGISTERED_BLOCKS_MUTABLE = new HashMap<>();
 	public static final List<Block> REGISTERED_BLOCKS_ORDERED = Collections.unmodifiableList(REGISTERED_BLOCKS_ORDERED_MUTABLE);
 	public static final Map<Identifier, Block> REGISTERED_BLOCKS = Collections.unmodifiableMap(REGISTERED_BLOCKS_MUTABLE);
+	public static final List<Block> REGISTERED_SLABS_O = new ArrayList<>();
+	public static final Map<Identifier, Block> REGISTERED_SLABS_M = new HashMap<>();
+	public static final List<Block> REGISTERED_SLABS_ORDERED = Collections.unmodifiableList(REGISTERED_SLABS_O);
+
+	public final BlockType type;
 
 	public static final String[] WOOL_NAMES = {
 			"black",
@@ -60,6 +65,9 @@ public class Block {
 	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
 			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
+	public static final Block[] SLABS = IntStream.range(0, REGISTERED_BLOCKS_ORDERED_MUTABLE.size())
+			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
+			.toArray(Block[]::new);
 
 	public final Identifier id;
 	protected BlockTexture texture;
@@ -70,21 +78,31 @@ public class Block {
 	}
 
 	public Block(String id) {
-		this(new Identifier(id));
+		this(new Identifier(id), BlockType.Normal);
+	}
+
+	public Block(String id, BlockType type) {
+		this(new Identifier(id), type);
 	}
 
 	public Block(String namespace, String name) {
-		this(new Identifier(namespace, name));
+		this(new Identifier(namespace, name), BlockType.Normal);
 	}
 
-	public Block(Identifier id) {
+	public Block(Identifier id, BlockType type) {
 		if (REGISTERED_BLOCKS.containsKey(id)) {
 			throw new IllegalArgumentException("Block \"" + id + "\" already exists");
 		}
 
+		this.type = type;
+
 		this.id = id;
 		REGISTERED_BLOCKS_ORDERED_MUTABLE.add(this);
 		REGISTERED_BLOCKS_MUTABLE.put(id, this);
+		if (type == BlockType.slab) {
+			REGISTERED_SLABS_O.add(this);
+			REGISTERED_SLABS_M.put(id, this);
+		}
 	}
 
 	public static Block fromId(Identifier id) {
@@ -140,9 +158,17 @@ public class Block {
 		return transparency.transparent;
 	}
 
-	public boolean isFaceDrawn(IBlockAccess blockAccess, int x, int y, int z, Direction face) {
+	public boolean isFaceDrawn(IBlockAccess blockAccess, int x, int y, int z, Direction face, Block ogBlock) {
 		Block block = blockAccess.getBlock(x, y, z);
-		if (block == null) {
+		try {
+			if (block.type == BlockType.slab && ogBlock.type == BlockType.slab && (face == Direction.BOTTOM || face == Direction.TOP)) {
+				return true;
+			}
+		} catch (NullPointerException e) {
+
+		}
+
+		if (block == null || (block.type == BlockType.slab && ogBlock.type != BlockType.slab ) ) {
 			return true;
 		}
 
@@ -158,6 +184,6 @@ public class Block {
 	}
 
 	public AABB getCollisionBox(int x, int y, int z) {
-		return new AABB(x, y, z, x + 1, y + 1, z + 1);
+		return new AABB(x, y, z, x + this.type.shape().x, y + this.type.shape().y, z + this.type.shape().z);
 	}
 }

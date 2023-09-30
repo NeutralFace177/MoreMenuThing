@@ -24,7 +24,7 @@ public enum Structures {
 
     private blockInStructure[] blocks;
 
-    private Structures(blockInStructure[] blocks) {
+    Structures(blockInStructure[] blocks) {
         this.blocks = blocks;
     }
 
