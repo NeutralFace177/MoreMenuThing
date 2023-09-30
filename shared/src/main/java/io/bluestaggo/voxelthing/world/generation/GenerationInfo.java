@@ -157,7 +157,7 @@ public class GenerationInfo {
 				double largeThreshold = biome == Biomes.Forest ? 0.8 : 0.8;
 				largeThreshold = (biome == Biomes.Desert || biome == Biomes.Plains) ? 102496 : largeThreshold;
 
-				float tree = OpenSimplex2Octaves.noise2(treeSeed, 5, x / baseScale, z / baseScale);
+				float tree = OpenSimplex2Octaves.noise2(treeSeed, 5, xx / baseScale, zz / baseScale);
 
 				int n = largeThreshold > tree && tree > threshold ? 1 : 0;
 				n = tree >= largeThreshold ? 2 : n;
