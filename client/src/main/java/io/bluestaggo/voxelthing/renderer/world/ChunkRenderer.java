@@ -1,5 +1,6 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
+import io.bluestaggo.voxelthing.assets.Texture;
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
@@ -9,6 +10,8 @@ import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.ChunkCache;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
+
 import org.joml.FrustumIntersection;
 
 public class ChunkRenderer {
@@ -68,10 +71,12 @@ public class ChunkRenderer {
 			}
 
 			IBlockAccess cache = new ChunkCache(world, x, y, z);
+			
 			for (int xx = 0; xx < Chunk.LENGTH; xx++) {
 				for (int yy = 0; yy < Chunk.LENGTH; yy++) {
 					for (int zz = 0; zz < Chunk.LENGTH; zz++) {
-						 empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+						empty &= !renderer.blockRenderer.render(bindings, cache, chunk, xx, yy, zz);
+						
 					}
 				}
 			}

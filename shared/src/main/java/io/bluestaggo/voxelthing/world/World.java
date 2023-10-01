@@ -186,10 +186,14 @@ public class World implements IBlockAccess {
 
 
 					if (trees != 0 && yy == Math.round(height) && yy > waterLevel && yy < snowHeight) {
-						//getOrLoadChunkAt(cx, cy+1, cz);
+						
 						if (trees == 1) {
 							for (int i = 0; i < Structures.SmallTree.getStructure().length; i++) {
-								setBlock(xx - Structures.SmallTree.getStructure()[i].x, yy - Structures.SmallTree.getStructure()[i].y, zz - Structures.SmallTree.getStructure()[i].z, Structures.SmallTree.getStructure()[i].block);
+								int xxx =  xx - Structures.SmallTree.getStructure()[i].x;
+								int yyy = yy - Structures.SmallTree.getStructure()[i].y;
+								int zzz = zz - Structures.SmallTree.getStructure()[i].z;
+
+								setBlock(xxx, yyy, zzz, Structures.SmallTree.getStructure()[i].block);
 							}
 						}
 						if (trees == 2) {

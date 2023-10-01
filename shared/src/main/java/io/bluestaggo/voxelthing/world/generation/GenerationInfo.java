@@ -227,15 +227,19 @@ public class GenerationInfo {
 	}
 
 	public Biomes getBiome(int x, int z) {
-		return biomes[x + z * Chunk.LENGTH];
+		if (biomes.length > x + z * Chunk.LENGTH && x + z * Chunk.LENGTH > 0) {
+			return biomes[x + z * Chunk.LENGTH];
+		}
+		return Biomes.Plains;
 	}
 
 	public String returnStringBiome(double x, double z) {
 		int xx = (int) x / Chunk.LENGTH;
 		int zz = (int) z / Chunk.LENGTH;
+		biomeGen();
 		try {
 			return getBiome(xx, zz).toString();
-		} catch (IndexOutOfBoundsException e) {
+		} catch (NullPointerException e) {
 			return "Depths Of Hell";
 		}
 

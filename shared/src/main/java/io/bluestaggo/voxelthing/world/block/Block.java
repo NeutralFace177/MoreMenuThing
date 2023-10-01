@@ -12,6 +12,8 @@ import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import org.joml.Vector2i;
+
 public class Block {
 	public static final int TEXTURE_RES = 512;
 	public static final int TEXTURE_ROWS = TEXTURE_RES / 16;
@@ -26,6 +28,7 @@ public class Block {
 	public static final List<Block> REGISTERED_SLABS_ORDERED = Collections.unmodifiableList(REGISTERED_SLABS_O);
 
 	public final BlockType type;
+	public String[] blockStates = {};
 
 	public static final String[] WOOL_NAMES = {
 			"black",
@@ -66,7 +69,7 @@ public class Block {
 			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
 	public static final Block[] SLABS = IntStream.range(0, REGISTERED_BLOCKS_ORDERED_MUTABLE.size())
-			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
+			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab, new String[]{"Bottom"}).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
 			.toArray(Block[]::new);
 
 	public final Identifier id;
@@ -78,23 +81,24 @@ public class Block {
 	}
 
 	public Block(String id) {
-		this(new Identifier(id), BlockType.Normal);
+		this(new Identifier(id), BlockType.Normal, new String[]{});
 	}
 
-	public Block(String id, BlockType type) {
-		this(new Identifier(id), type);
+	public Block(String id, BlockType type, String[] states) {
+		this(new Identifier(id), type, states);
 	}
 
 	public Block(String namespace, String name) {
-		this(new Identifier(namespace, name), BlockType.Normal);
+		this(new Identifier(namespace, name), BlockType.Normal, new String[]{});
 	}
 
-	public Block(Identifier id, BlockType type) {
+	public Block(Identifier id, BlockType type, String[] states) {
 		if (REGISTERED_BLOCKS.containsKey(id)) {
 			throw new IllegalArgumentException("Block \"" + id + "\" already exists");
 		}
 
 		this.type = type;
+		this.blockStates = states;
 
 		this.id = id;
 		REGISTERED_BLOCKS_ORDERED_MUTABLE.add(this);

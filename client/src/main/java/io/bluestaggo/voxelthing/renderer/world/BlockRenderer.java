@@ -1,6 +1,8 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
+import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.IBlockAccess;
@@ -38,7 +40,7 @@ public class BlockRenderer {
 		if (block == null) {
 			return false;
 		}
-		BlockType type = block.type;
+		
 		xOffSet = block.type.shape().x;
 		yOffSet = block.type.shape().y;
 		zOffSet = block.type.shape().z;
@@ -46,12 +48,12 @@ public class BlockRenderer {
 		int xx = x + Chunk.LENGTH * chunk.x;
 		int yy = y + Chunk.LENGTH * chunk.y;
 		int zz = z + Chunk.LENGTH * chunk.z;
+		
 		for (Direction dir : Direction.ALL) {
 			if (block.isFaceDrawn(blockAccess, xx + dir.X, yy + dir.Y, zz + dir.Z, dir, block)) {
 				SIDE_RENDERERS[dir.ordinal()].render(bindings, blockAccess, block, xx, yy, zz);
 			}
 		}
-
 		return true;
 	}
 

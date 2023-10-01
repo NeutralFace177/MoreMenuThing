@@ -11,6 +11,7 @@ import io.bluestaggo.voxelthing.renderer.world.BlockRenderer;
 import io.bluestaggo.voxelthing.renderer.world.Camera;
 import io.bluestaggo.voxelthing.renderer.world.EntityRenderer;
 import io.bluestaggo.voxelthing.renderer.world.WorldRenderer;
+import io.bluestaggo.voxelthing.renderer.world.BlockOverlayRenderer;
 import io.bluestaggo.voxelthing.window.Window;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -37,6 +38,7 @@ public class MainRenderer {
 	public final WorldRenderer worldRenderer;
 	public final BlockRenderer blockRenderer;
 	public final EntityRenderer entityRenderer;
+	public final BlockOverlayRenderer blockOverlayRenderer;
 
 	public final Draw2D draw2D;
 
@@ -66,6 +68,7 @@ public class MainRenderer {
 			worldRenderer = new WorldRenderer(this);
 			blockRenderer = new BlockRenderer();
 			entityRenderer = new EntityRenderer(this);
+			blockOverlayRenderer = new BlockOverlayRenderer();
 
 			draw2D = new Draw2D(this);
 

@@ -5,6 +5,7 @@ import io.bluestaggo.pds.ListItem;
 import io.bluestaggo.voxelthing.Identifier;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.storage.EmptyBlockStorage;
+import io.bluestaggo.voxelthing.world.generation.blockInStructure;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,18 +1,30 @@
 package io.bluestaggo.voxelthing.renderer.world;
 
+import io.bluestaggo.voxelthing.Game;
 import io.bluestaggo.voxelthing.renderer.GLState;
 import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.util.Primitives;
 import io.bluestaggo.voxelthing.renderer.vertices.Bindings;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexLayout;
+import io.bluestaggo.voxelthing.renderer.vertices.VertexType;
 import io.bluestaggo.voxelthing.window.Window;
+import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.Chunk;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
+
 import org.joml.FrustumIntersection;
 import org.joml.Vector3f;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL11C.GL_BACK;
+import static org.lwjgl.opengl.GL11C.GL_BLEND;
+import static org.lwjgl.opengl.GL11C.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11C.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11C.GL_FRONT;
+import static org.lwjgl.opengl.GL11C.glCullFace;
 import static org.lwjgl.opengl.GL33C.*;
 
 public class WorldRenderer {
@@ -93,6 +105,17 @@ public class WorldRenderer {
 			renderer.worldShader.fade.set((float)chunkRenderer.getFadeAmount(currentTime));
 			chunkRenderer.draw();
 		}
+		Game game = Game.getInstance();
+		BlockRaycast raycast = game.getBlockRaycast();
+		Bindings bindings = new Bindings(VertexLayout.WORLD);
+		if (raycast.blockHit()) {
+			renderer.blockOverlayRenderer.render(bindings, raycast.getHitX(), raycast.getHitY(), raycast.getHitZ(), raycast.getHitFace());
+		}
+		if (bindings != null) {
+			bindings.upload(true);
+			bindings.draw();
+		}
+
 
 		renderer.worldShader.fade.set(0.0f);
 	}
