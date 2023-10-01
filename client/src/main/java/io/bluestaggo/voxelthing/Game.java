@@ -192,6 +192,7 @@ public class Game {
 		player = new Player(world, playerController);
 
 		CompoundItem playerData = saveHandler.loadData("player");
+		playerData.setDouble("posX", 1000);
 		if (playerData != null) {
 			player.deserialize(playerData);
 		}

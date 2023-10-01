@@ -15,8 +15,8 @@ import org.joml.Vector2i;
 import org.joml.Vector3f;
 
 public class BlockOverlayRenderer {
-	private static final float SHADE_FACTOR = 0.15f;
-	private static final float OFFSET = 0.0125f;
+	private static final float SHADE_FACTOR = 0.075f;
+	private float OFFSET = 0.0025f;
 	private final SideRenderer[] SIDE_RENDERERS = {
 			this::renderNorthFace,
 			this::renderSouthFace,
@@ -35,7 +35,14 @@ public class BlockOverlayRenderer {
 		return 1.0f - SHADE_FACTOR * amount;
 	}
 
-	public boolean render(Bindings bindings, int x, int y, int z, Direction face) {	
+	public boolean render(Bindings bindings, int x, int y, int z, Direction face) {
+		if (Math.abs(x) > 15000 || Math.abs(z) > 15000) {
+			OFFSET = 0.05f;
+		} else if (Math.abs(x) > 3000 || Math.abs(z) > 3000) {
+			OFFSET = 0.005f;
+		} else {
+			OFFSET = 0.0015f;
+		}
 		AllSidesTexture texture;
 		for (Direction dir : Direction.ALL) {
 			if (dir == face) {
