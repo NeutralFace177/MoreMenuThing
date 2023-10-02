@@ -25,6 +25,11 @@ public class Player extends Entity {
 	public double friction = 0.6;
 	public double jumpHeight = 0.5;
 
+	public int health = 20;
+	public int maxHealth = 20;
+
+	public boolean survival = true;
+
 	public Player(World world, IPlayerController controller) {
 		super(world);
 		this.controller = controller;
@@ -41,8 +46,24 @@ public class Player extends Entity {
 		jumpPressed |= controller.doJump();
 	}
 
+	public int damage(int amount) {
+		health -= amount;
+		health = health < 0 ? health : 0;
+		return health;
+	}
+
+	public int heal(int amount) {
+		health += amount;
+		health = health > maxHealth ? health : maxHealth;
+		return health;
+	}
+
 	protected void update() {
 		super.update();
+		if (survival) {
+			hasGravity = true;
+			noClip = false;
+		}
 
 		if (jumpTimer > 0) {
 			jumpTimer--;

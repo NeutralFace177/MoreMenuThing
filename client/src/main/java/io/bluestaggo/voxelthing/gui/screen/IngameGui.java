@@ -26,7 +26,12 @@ public class IngameGui extends GuiScreen {
 	private int[] prevHoverProgress;
 	private int[] hoverProgress;
 	private int swingTick = 0;
+	private int maxMiningTick = 54;
+	private int miningTick = maxMiningTick;
+	int px,py,pz;
 	private boolean firstBlock = true;
+	//is left click held
+	private boolean mouseHeld = false;
 	public ArrayList<blockInStructure> structure = new ArrayList<>();
 
 	int sx = 0;
@@ -56,6 +61,7 @@ public class IngameGui extends GuiScreen {
 
 	@Override
 	public void tick() {
+		BlockRaycast raycast = game.getBlockRaycast();
 		for (int i = 0; i < game.palette.length; i++) {
 			int hover = hoverProgress[i];
 			prevHoverProgress[i] = hover;
@@ -69,10 +75,32 @@ public class IngameGui extends GuiScreen {
 			hover = MathUtil.clamp(hover, 0, Game.TICKS_PER_SECOND / 4);
 			hoverProgress[i] = hover;
 		}
+		game.renderer.worldRenderer.mining = miningTick < maxMiningTick;
+		game.renderer.worldRenderer.mineProgress = (int)Math.round(((double)miningTick / (double)maxMiningTick) * 6);
 
 		if (swingTick > 0) {
 			swingTick--;
 		}
+		if (miningTick > 0 && mouseHeld) {
+			miningTick--;
+		}
+		int x = raycast.getHitX();
+		int y = raycast.getHitY();
+		int z = raycast.getHitZ();
+		if (px != x || py != y || pz != z) {
+			miningTick = maxMiningTick;
+		}
+		if (miningTick == 0) {
+			if (raycast.blockHit()) {
+				game.palette[game.heldItem] = game.world.getBlock(x, y, z);
+				game.world.setBlock(x, y, z, null);
+				miningTick = maxMiningTick;
+			}
+			
+		}
+		px = raycast.getHitX();
+		py = raycast.getHitY();
+		pz = raycast.getHitZ();
 	}
 
 	@Override
@@ -215,12 +243,32 @@ public class IngameGui extends GuiScreen {
 		return game.palette[game.heldItem];
 	}
 
+	
+	@Override
+	protected void onMouseReleased(int button, int mx, int my) {
+		super.onMouseReleased(button, mx, my);
+		if (button == 0) {
+			mouseHeld = false;
+			miningTick = maxMiningTick;
+		}
+	}
+
+	@Override
+	protected void onMouseHeld(int button, int mx, int my) {
+		super.onMouseHeld(button, mx, my);
+		if (button == 0) {
+			mouseHeld = true;
+			BlockRaycast raycast = game.getBlockRaycast();
+			if (raycast.blockHit() && game.player.survival) {
+				maxMiningTick = game.world.getBlock(raycast.getHitX(), raycast.getHitY(), raycast.getHitZ()).hardnessTick();
+			}
+		}
+	}
+
+
 	@Override
 	protected void onMouseClicked(int button, int mx, int my) {
 		super.onMouseClicked(button, mx, my);
-
-
-
 		BlockRaycast raycast = game.getBlockRaycast();
 		if (raycast.blockHit()) {
 			int x = raycast.getHitX();
@@ -229,8 +277,13 @@ public class IngameGui extends GuiScreen {
 			Direction face = raycast.getHitFace();
 
 			if (button == 0) {
-				game.world.setBlock(x, y, z, null);
-				if (game.structureMode) {
+			if (raycast.blockHit()) {
+				maxMiningTick = game.world.getBlock(raycast.getHitX(), raycast.getHitY(), raycast.getHitZ()).hardnessTick();
+				miningTick = maxMiningTick;
+			}
+				if (!game.player.survival) {
+					game.world.setBlock(x, y, z, null);
+					if (game.structureMode) {
 
 					for (int i = 0; i < structure.size(); i++) {
 						if (sx-x == structure.get(i).x && sy-y == structure.get(i).y && sz-z == structure.get(i).z) {
@@ -250,7 +303,10 @@ public class IngameGui extends GuiScreen {
 							break;
 						}
 					}
+				} 
 				}
+
+				
 			} else if (button == 1) {
 				Block placedBlock = getPlacedBlock();
 

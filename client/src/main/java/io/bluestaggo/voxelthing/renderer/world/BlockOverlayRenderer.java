@@ -36,6 +36,10 @@ public class BlockOverlayRenderer {
 	}
 
 	public boolean render(Bindings bindings, int x, int y, int z, Direction face) {
+		return render(bindings, x, y, z, face, new AllSidesTexture(30, 31), false);
+	}
+
+	public boolean render(Bindings bindings, int x, int y, int z, Direction face, AllSidesTexture texture, boolean mining) {
 		if (Math.abs(x) > 15000 || Math.abs(z) > 15000) {
 			OFFSET = 0.05f;
 		} else if (Math.abs(x) > 3000 || Math.abs(z) > 3000) {
@@ -43,12 +47,13 @@ public class BlockOverlayRenderer {
 		} else {
 			OFFSET = 0.0015f;
 		}
-		AllSidesTexture texture;
 		for (Direction dir : Direction.ALL) {
-			if (dir == face) {
-				texture = new AllSidesTexture(30, 30);
-			} else {
-				texture = new AllSidesTexture(30, 31);
+			if (!mining) {
+				if (dir == face) {
+					texture = new AllSidesTexture(30, 30);
+				} else {
+					texture = new AllSidesTexture(30, 31);
+				}
 			}
 			SIDE_RENDERERS[dir.ordinal()].render(bindings, texture, x, y, z);
 		}

@@ -110,6 +110,7 @@ public class MainRenderer {
 			state.enable(GL_DEPTH_TEST);
 			glCullFace(GL_FRONT);
 
+
 			setupSkyShader(view, proj);
 			setupCloudShader(viewProj);
 			skyFramebuffer.use();

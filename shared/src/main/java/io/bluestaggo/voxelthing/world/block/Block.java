@@ -29,6 +29,8 @@ public class Block {
 
 	public final BlockType type;
 	public String[] blockStates = {};
+	//how long in multiples of 5 ticks it takes to mine a block 
+	public float hardness = 5;
 
 	public static final String[] WOOL_NAMES = {
 			"black",
@@ -50,26 +52,26 @@ public class Block {
 	};
 
 	public static final Identifier ID_AIR = new Identifier("air");
-	public static final Block STONE = new Block("stone").withTex(1, 0);
-	public static final Block GRASS = new Block("grass").withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
-	public static final Block DIRT = new Block("dirt").withTex(0, 2);
-	public static final Block COBBLESTONE = new Block("cobblestone").withTex(1, 1);
-	public static final Block BRICKS = new Block("bricks").withTex(3, 2);
-	public static final Block PLANKS = new Block("planks").withTex(3, 0);
-	public static final Block LOG = new Block("log").withTex(new ColumnTexture(3, 1, 4, 1));
-	public static final Block LEAVES = new Block("leaves").withTex(4, 0).transparency(BlockTransparency.THICK);
-	public static final Block GLASS = new Block("glass").withTex(4, 2).transparency(BlockTransparency.FULL);
-	public static final Block SAND = new Block("sand").withTex(2, 0);
-	public static final Block GRAVEL = new Block("gravel").withTex(2, 1);
-	public static final Block STONE_BRICKS = new Block("stone_bricks").withTex(2, 2);
-	public static final Block POLISHED_STONE = new Block("polished_stone").withTex(1, 2);
-	public static final Block WATER = new Block("water").withTex(4,3).transparency(BlockTransparency.FULL);
-	public static final Block SNOW = new Block("snow").withTex(4,4);
+	public static final Block STONE = new Block("stone", 10).withTex(1, 0);
+	public static final Block GRASS = new Block("grass", 2.5f).withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
+	public static final Block DIRT = new Block("dirt", 2).withTex(0, 2);
+	public static final Block COBBLESTONE = new Block("cobblestone", 8).withTex(1, 1);
+	public static final Block BRICKS = new Block("bricks", 8).withTex(3, 2);
+	public static final Block PLANKS = new Block("planks", 4).withTex(3, 0);
+	public static final Block LOG = new Block("log", 4.25f).withTex(new ColumnTexture(3, 1, 4, 1));
+	public static final Block LEAVES = new Block("leaves", 1.5f).withTex(4, 0).transparency(BlockTransparency.THICK);
+	public static final Block GLASS = new Block("glass", 1.5f).withTex(4, 2).transparency(BlockTransparency.FULL);
+	public static final Block SAND = new Block("sand", 2).withTex(2, 0);
+	public static final Block GRAVEL = new Block("gravel", 2).withTex(2, 1);
+	public static final Block STONE_BRICKS = new Block("stone_bricks", 8).withTex(2, 2);
+	public static final Block POLISHED_STONE = new Block("polished_stone", 10).withTex(1, 2);
+	public static final Block WATER = new Block("water", 2/5).withTex(4,3).transparency(BlockTransparency.FULL);
+	public static final Block SNOW = new Block("snow", 2).withTex(4,4);
 	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
-			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i]).withTex(i % 4, i / 4 + 3))
+			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i], 3).withTex(i % 4, i / 4 + 3))
 			.toArray(Block[]::new);
 	public static final Block[] SLABS = IntStream.range(0, REGISTERED_BLOCKS_ORDERED_MUTABLE.size())
-			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab, new String[]{"Bottom"}).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
+			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab, new String[]{"Bottom"}, REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).hardness).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
 			.toArray(Block[]::new);
 
 	public final Identifier id;
@@ -81,18 +83,31 @@ public class Block {
 	}
 
 	public Block(String id) {
-		this(new Identifier(id), BlockType.Normal, new String[]{});
+		this(new Identifier(id), BlockType.Normal, new String[]{}, 2147483647);
+	}
+
+	public Block(String id, float hardness) {
+		this(new Identifier(id), BlockType.Normal, new String[]{}, hardness);
 	}
 
 	public Block(String id, BlockType type, String[] states) {
-		this(new Identifier(id), type, states);
+		this(new Identifier(id), type, states, 2147483647);
+	}
+
+	public Block(String id, BlockType type, String[] states, float hardness) {
+		this(new Identifier(id), type, states, hardness);
 	}
 
 	public Block(String namespace, String name) {
-		this(new Identifier(namespace, name), BlockType.Normal, new String[]{});
+		this(new Identifier(namespace, name), BlockType.Normal, new String[]{}, 2147483647);
 	}
 
-	public Block(Identifier id, BlockType type, String[] states) {
+	public Block(String namespace, String name, float hardness) {
+		this(new Identifier(namespace, name), BlockType.Normal, new String[]{}, hardness);
+	}
+
+	public Block(Identifier id, BlockType type, String[] states, float hardness) {
+		this.hardness  = hardness;
 		if (REGISTERED_BLOCKS.containsKey(id)) {
 			throw new IllegalArgumentException("Block \"" + id + "\" already exists");
 		}
@@ -138,6 +153,10 @@ public class Block {
 	@Override
 	public String toString() {
 		return id.toString();
+	}
+
+	public int hardnessTick() {
+		return (int)Math.ceil((double)hardness * 5d) > 0 ? (int)Math.ceil((double)hardness * 5d) : 1;
 	}
 
 	protected Block withTex(int x, int y) {

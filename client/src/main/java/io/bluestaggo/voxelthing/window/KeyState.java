@@ -1,5 +1,7 @@
 package io.bluestaggo.voxelthing.window;
 
+import io.bluestaggo.voxelthing.world.generation.blockInStructure;
+
 public class KeyState {
 	private boolean pressed;
 	private boolean wasPressed;
@@ -22,6 +24,10 @@ public class KeyState {
 
 	public boolean justPressed() {
 		return pressed && !wasPressed;
+	}
+
+	public boolean wasReleased() {
+		return !pressed & wasPressed;
 	}
 
 	@Override

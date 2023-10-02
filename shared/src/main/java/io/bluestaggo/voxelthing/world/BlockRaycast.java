@@ -12,6 +12,7 @@ public class BlockRaycast {
 
 	private boolean hit;
 	private int hitX, hitY, hitZ;
+	private int prevHitX, prevHitY, prevHitZ;
 	private Direction hitFace;
 
 	public BlockRaycast(Vector3d position, Vector3d direction, double length) {
@@ -23,6 +24,9 @@ public class BlockRaycast {
 	void setResult(int hitX, int hitY, int hitZ, Direction hitFace) {
 		if (this.hitFace == null) {
 			hit = true;
+			this.prevHitX = this.hitX;
+			this.prevHitY = this.hitY;
+			this.prevHitZ = this.hitZ;
 			this.hitX = hitX;
 			this.hitY = hitY;
 			this.hitZ = hitZ;
@@ -42,12 +46,29 @@ public class BlockRaycast {
 		return hitZ;
 	}
 
+	public int getPrevHitX() {
+		return prevHitX;
+	}
+
+	public int getPrevHitY() {
+		return prevHitY;
+	}
+
+	public int getPrevHitZ() {
+		return prevHitZ;
+	}
+
 	public Direction getHitFace() {
 		return hitFace;
 	}
 
 	public boolean blockHit() {
 		return hit;
+	}
+
+	//DOES NOT WORK!~!!!
+	public boolean sameBlockHit(int thisShitNoWork) {
+		return (prevHitX == hitX && prevHitY == hitY && prevHitZ == hitZ);
 	}
 
 	public String getDebugText(World world) {

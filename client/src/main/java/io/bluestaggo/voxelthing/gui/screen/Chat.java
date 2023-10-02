@@ -53,6 +53,12 @@ public class Chat extends GuiScreen {
                 game.structureMode = false;
                 game.structurePaintMode = false;
             }
+            if (chatBox.text.equals("survival")) {
+                game.player.survival = true;
+            }
+            if (chatBox.text.equals("creative")) {
+                game.player.survival = false;
+            }
         } catch (Exception e) {
 
         }

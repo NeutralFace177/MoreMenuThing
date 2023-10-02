@@ -38,6 +38,8 @@ public class WorldRenderer {
 	private int minX, minY, minZ;
 	private int maxX, maxY, maxZ;
 	private int renderRange;
+	public boolean mining;
+	public int mineProgress;
 
 	public int renderDistance = 16;
 
@@ -109,6 +111,10 @@ public class WorldRenderer {
 		BlockRaycast raycast = game.getBlockRaycast();
 		Bindings bindings = new Bindings(VertexLayout.WORLD);
 		if (raycast.blockHit()) {
+			if (mining) {
+				renderer.blockOverlayRenderer.render(bindings, raycast.getHitX(), raycast.getHitY(), raycast.getHitZ(), raycast.getHitFace(), new AllSidesTexture(28-mineProgress+2, 31), true);
+				System.out.println(mineProgress);
+			}
 			renderer.blockOverlayRenderer.render(bindings, raycast.getHitX(), raycast.getHitY(), raycast.getHitZ(), raycast.getHitFace());
 		}
 		if (bindings != null) {

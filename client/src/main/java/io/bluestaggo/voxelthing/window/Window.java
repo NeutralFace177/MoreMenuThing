@@ -43,7 +43,7 @@ public class Window {
 	private boolean cursorGrabbed;
 
 	private final KeyState[] keyStates;
-	private final KeyState[] mouseStates;
+	public final KeyState[] mouseStates;
 	private final Set<Character> pressedCharacters = new HashSet<>();
 	private final Set<Character> pressedCharactersImmutable = Collections.unmodifiableSet(pressedCharacters);
 
@@ -295,6 +295,10 @@ public class Window {
 		return mouseStates[mouse].isPressed();
 	}
 
+	public boolean isMouseReleased(int mouse) {
+		return mouseStates[mouse].wasReleased();
+	}
+
 	public boolean isMouseJustPressed(int mouse) {
 		return mouseStates[mouse].justPressed();
 	}
@@ -303,6 +307,17 @@ public class Window {
 		return IntStream.range(0, mouseStates.length)
 				.filter(this::isMouseJustPressed)
 				.toArray();
+	}
+
+	public int[] getHeldMouseButtons() {
+		return IntStream.range(0, mouseStates.length)
+		.filter(this::isMouseDown)
+		.toArray();
+	}
+	public int[] getReleasedMouseButtons() {
+		return IntStream.range(0, mouseStates.length)
+		.filter(this::isMouseReleased)
+		.toArray();
 	}
 
 	public static double getTimeElapsed() {

@@ -6,6 +6,7 @@ import io.bluestaggo.voxelthing.gui.control.GuiFocusable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public abstract class GuiScreen {
 	public final Game game;
@@ -55,6 +56,12 @@ public abstract class GuiScreen {
 		for (int mouse : game.window.getMouseButtonsJustPressed()) {
 			onMouseClicked(mouse, game.renderer.screen.getMouseX(), game.renderer.screen.getMouseY());
 		}
+		for (int mouse : game.window.getHeldMouseButtons()) {
+			onMouseHeld(mouse, game.renderer.screen.getMouseX(), game.renderer.screen.getMouseY());
+		}
+		for (int mouse : game.window.getReleasedMouseButtons()) {
+			onMouseReleased(mouse, game.renderer.screen.getMouseX(), game.renderer.screen.getMouseY());
+		}
 
 		if (game.window.getScrollY() != 0.0) {
 			onMouseScrolled(game.window.getScrollY());
@@ -75,6 +82,14 @@ public abstract class GuiScreen {
 				focusedControl = focusable;
 			}
 		}
+	}
+
+	protected void onMouseHeld(int button, int mx, int my) {
+		//do shit
+	}
+
+	protected void onMouseReleased(int button, int mx, int my) {
+		//do nothying
 	}
 
 	protected void onMouseScrolled(double scroll) {
