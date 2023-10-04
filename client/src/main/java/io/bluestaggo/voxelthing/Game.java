@@ -352,6 +352,12 @@ public class Game {
 		if (window.isKeyJustPressed(GLFW_KEY_T)) {
 			openGui(new Chat(this));
 		}
+		if (window.isKeyJustPressed(GLFW_KEY_EQUAL)) {
+			player.health++;
+		}
+		if (window.isKeyJustPressed(GLFW_KEY_MINUS)) {
+			player.health--;
+		}
 	}
 
 	private void draw() {

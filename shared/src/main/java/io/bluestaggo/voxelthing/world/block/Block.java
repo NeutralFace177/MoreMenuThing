@@ -56,7 +56,7 @@ public class Block {
 	public static final Block GRASS = new Block("grass", 2.5f).withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block("dirt", 2).withTex(0, 2);
 	public static final Block COBBLESTONE = new Block("cobblestone", 8).withTex(1, 1);
-	public static final Block BRICKS = new Block("bricks", 8).withTex(3, 2);
+	public static final Block BRICKS = new Block("bricks", 8.75f).withTex(3, 2);
 	public static final Block PLANKS = new Block("planks", 4).withTex(3, 0);
 	public static final Block LOG = new Block("log", 4.25f).withTex(new ColumnTexture(3, 1, 4, 1));
 	public static final Block LEAVES = new Block("leaves", 1.5f).withTex(4, 0).transparency(BlockTransparency.THICK);

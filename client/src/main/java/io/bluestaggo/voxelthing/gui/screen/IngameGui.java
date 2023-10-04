@@ -13,6 +13,7 @@ import io.bluestaggo.voxelthing.world.generation.blockInStructure;
 import io.bluestaggo.voxelthing.world.generation.Structures;
 
 import org.joml.Vector2i;
+import org.joml.Vector4f;
 import org.lwjgl.system.Struct;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -84,9 +85,15 @@ public class IngameGui extends GuiScreen {
 		if (miningTick > 0 && mouseHeld) {
 			miningTick--;
 		}
-		int x = raycast.getHitX();
-		int y = raycast.getHitY();
-		int z = raycast.getHitZ();
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		if (raycast.blockHit()) {
+			x = raycast.getHitX();
+			y = raycast.getHitY();
+			z = raycast.getHitZ();
+		}
+
 		if (px != x || py != y || pz != z) {
 			miningTick = maxMiningTick;
 		}
@@ -113,6 +120,7 @@ public class IngameGui extends GuiScreen {
 		}
 
 		drawHotbar();
+		drawHealthBar();
 	}
 
 	private void drawCrosshair() {
@@ -236,6 +244,47 @@ public class IngameGui extends GuiScreen {
 		}
 	}
 
+	private void drawHealthBar() {
+		MainRenderer r = game.renderer;
+
+		
+		int[] s = new int[]{7,9,11,13,15,17};
+		int[] g = new int[]{17+15+13+11+9+7, 17+15+13+11+9, 17+15+13+11,17+15+13,17+15,17};
+
+		float startX = (r.screen.getWidth() - 32 * game.palette.length) / 2.0f;
+		float startY = r.screen.getHeight() - 32 - 5;
+		int h = game.player.health;
+		//health divided by 6 floored
+		int value = (int)Math.floor((double)h/(double)6);
+		//undivide by 6
+		int v = value * 6;
+		int a = value == 0 ? 1 : value;
+		float j = g[(h-v)];
+		float l = j + s[(h-v)];
+		int i = 0;
+		System.out.println("value:" + value + " v:" + v + " a:" + a + " h:" + h);
+		for (i = 0; i < a; i++) {
+			if (value != 0) {
+				r.draw2D.drawQuad(healthIcon(startX + i * s[5] + 57, startY - 10, s[5], new Vector4f(1/512f, 1f/512f, 18f/512f, 18f/512f)));
+			}
+			int m = value == 0 ? 0 : i+1;
+			if (i == a-1 && v != h) {
+				r.draw2D.drawQuad(healthIcon(startX + (m) * s[5] + 57, startY - 13 + s[5-(h-v-1)]/2, s[h-v-1],
+		 		 new Vector4f( (1f + (2 * (6-(h-v))) + j) / 512f, 1f/512f, (1f + (2 * (6-(h-v+1))) + l) / 512f, (1f + s[h-v-1]) / 512f)));;
+			}
+		}
+	}
+
+	private Quad healthIcon(float sx, float sy, float size, Vector4f uv) {
+		Texture healthTexture = game.renderer.textures.getTexture("/assets/gui/icons.png");
+	//	System.out.println("x:" + uv.x*512 + " y:" + uv.y*512 + " z:" + uv.z*512 + " w:" + uv.w*512);
+		return new Quad()
+			.at(sx, sy)
+			.size(size, size)
+			.withTexture(healthTexture)
+			.withUV(uv.x, uv.y, uv.z, uv.w);
+	}
+
 	private Block getPlacedBlock() {
 		if (game.heldItem < 0 || game.heldItem >= game.palette.length) {
 			return null;
@@ -259,8 +308,8 @@ public class IngameGui extends GuiScreen {
 		if (button == 0) {
 			mouseHeld = true;
 			BlockRaycast raycast = game.getBlockRaycast();
-			if (raycast.blockHit() && game.player.survival) {
-				maxMiningTick = game.world.getBlock(raycast.getHitX(), raycast.getHitY(), raycast.getHitZ()).hardnessTick();
+			if (raycast.blockHit()) {
+				maxMiningTick = game.player.survival ? game.world.getBlock(raycast.getHitX(), raycast.getHitY(), raycast.getHitZ()).hardnessTick() : 5; 
 			}
 		}
 	}

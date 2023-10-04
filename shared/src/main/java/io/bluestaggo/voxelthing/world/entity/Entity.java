@@ -41,6 +41,9 @@ public class Entity {
 	public boolean noClip;
 	protected boolean hasGravity = true;
 
+	public int health = 20;
+	public int maxHealth = 20;
+
 	public Entity(World world) {
 		this.world = world;
 		texture = "/assets/entities/template.png";
@@ -59,6 +62,18 @@ public class Entity {
 
 		update();
 		updateMovement();
+	}
+
+	public int damage(int amount) {
+		health -= amount;
+		health = health < 0 ? health : 0;
+		return health;
+	}
+
+	public int heal(int amount) {
+		health += amount;
+		health = health > maxHealth ? health : maxHealth;
+		return health;
 	}
 
 	protected void update() {
