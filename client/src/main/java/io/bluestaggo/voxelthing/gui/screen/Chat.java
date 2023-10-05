@@ -45,7 +45,7 @@ public class Chat extends GuiScreen {
                 game.structureMode = true;
                 game.structurePaintMode = false;
             }
-            if (chatBox.text.substring(0, 5).equals("paint")) {
+            if (chatBox.text.substring(0, 4).equals("paint")) {
                 game.structureMode = false;
                 game.structurePaintMode = true;
             }
@@ -58,6 +58,9 @@ public class Chat extends GuiScreen {
             }
             if (chatBox.text.equals("creative")) {
                 game.player.survival = false;
+            }
+            if (chatBox.text.equals("health")) {
+                game.openGui(new HealthOptions(game));
             }
         } catch (Exception e) {
 

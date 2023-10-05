@@ -33,7 +33,10 @@ public class IngameGui extends GuiScreen {
 	private boolean firstBlock = true;
 	//is left click held
 	private boolean mouseHeld = false;
+	int healthVisualMin = 1;
+	int healthVisualMax = 6;
 	public ArrayList<blockInStructure> structure = new ArrayList<>();
+	private static IngameGui instance;
 
 	int sx = 0;
 	int sy = 0;
@@ -41,6 +44,7 @@ public class IngameGui extends GuiScreen {
 
 	public IngameGui(Game game) {
 		super(game);
+		instance = this;
 		prevHoverProgress = new int[game.palette.length];
 		hoverProgress = new int[game.palette.length];
 	}
@@ -58,6 +62,10 @@ public class IngameGui extends GuiScreen {
 		if (newIndex >= 0 && newIndex < game.palette.length) {
 			game.heldItem = newIndex;
 		}
+	}
+
+	public static IngameGui getInstance() {
+		return instance;
 	}
 
 	@Override
@@ -255,22 +263,23 @@ public class IngameGui extends GuiScreen {
 		float startY = r.screen.getHeight() - 32 - 5;
 		int h = game.player.health;
 		//health divided by 6 floored
-		int value = (int)Math.floor((double)h/(double)6);
+		int k = healthVisualMax-healthVisualMin+1;
+		int value = (int)Math.floor((double)h/(double)k);
 		//undivide by 6
-		int v = value * 6;
+		int v = value * k;
 		int a = value == 0 ? 1 : value;
 		float j = g[(h-v)];
 		float l = j + s[(h-v)];
 		int i = 0;
-		System.out.println("value:" + value + " v:" + v + " a:" + a + " h:" + h);
+		//System.out.println(k);
 		for (i = 0; i < a; i++) {
 			if (value != 0) {
-				r.draw2D.drawQuad(healthIcon(startX + i * s[5] + 57, startY - 10, s[5], new Vector4f(1/512f, 1f/512f, 18f/512f, 18f/512f)));
+				r.draw2D.drawQuad(healthIcon(startX + i * s[healthVisualMax-1] + 57, startY - 10, s[healthVisualMax-1], new Vector4f(1f/512f, 1f/512f, 18f/512f, 18f/512f)));
 			}
 			int m = value == 0 ? 0 : i+1;
 			if (i == a-1 && v != h) {
-				r.draw2D.drawQuad(healthIcon(startX + (m) * s[5] + 57, startY - 13 + s[5-(h-v-1)]/2, s[h-v-1],
-		 		 new Vector4f( (1f + (2 * (6-(h-v))) + j) / 512f, 1f/512f, (1f + (2 * (6-(h-v+1))) + l) / 512f, (1f + s[h-v-1]) / 512f)));;
+				r.draw2D.drawQuad(healthIcon(startX + (m) * s[healthVisualMax-1] + 57, startY - 13 + s[(k-1)-(h-v-1)]/2, s[h-v-1],
+		 		 new Vector4f( (1f + (2 * (k-(h-v))) + j) / 512f, 1f/512f, (1f + (2 * (k-(h-v+1))) + l) / 512f, (1f + s[h-v-1]) / 512f)));;
 			}
 		}
 	}

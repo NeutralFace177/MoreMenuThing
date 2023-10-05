@@ -40,6 +40,7 @@ public class Entity {
 	public boolean onGround;
 	public boolean noClip;
 	protected boolean hasGravity = true;
+	public double fellFromHeight;
 
 	public int health = 20;
 	public int maxHealth = 20;
@@ -66,7 +67,7 @@ public class Entity {
 
 	public int damage(int amount) {
 		health -= amount;
-		health = health < 0 ? health : 0;
+		health = health < 0 ? 0 : health;
 		return health;
 	}
 
@@ -77,8 +78,22 @@ public class Entity {
 	}
 
 	protected void update() {
+		if (justFell()) {
+			fellFromHeight = posY;
+		}
+		if (justLanded()) {
+			int damage = (int)((fellFromHeight - posY)) - 3;
+			damage = damage < 0 ? 0 : damage;
+			System.out.println(damage);
+			damage(damage);
+		}
 		if (hasGravity && velY > -4.0) {
 			velY -= 0.1;
+		}
+		if (health == 0) {
+			posX = 12312312d;
+			posZ = 123213123d;
+			posY = 30;
 		}
 	}
 
