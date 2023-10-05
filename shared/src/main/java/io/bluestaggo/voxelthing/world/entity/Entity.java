@@ -41,6 +41,7 @@ public class Entity {
 	public boolean noClip;
 	protected boolean hasGravity = true;
 	public double fellFromHeight;
+	public boolean alive = true;
 
 	public int health = 20;
 	public int maxHealth = 20;
@@ -91,9 +92,7 @@ public class Entity {
 			velY -= 0.1;
 		}
 		if (health == 0) {
-			posX = 12312312d;
-			posZ = 123213123d;
-			posY = 30;
+			alive = false;
 		}
 	}
 

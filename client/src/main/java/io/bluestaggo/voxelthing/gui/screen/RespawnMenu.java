@@ -10,32 +10,26 @@ import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 
-public class PauseMenu extends GuiScreen {
+public class RespawnMenu extends GuiScreen {
 
-	private final GuiControl saveQuitButton;
-    private final GuiControl optionsButton;
-    private final GuiControl returnButton;
+    private final GuiControl respawnButton;
+    private final GuiControl saveQuitButton;
 
-    public PauseMenu(Game game) {
+    public RespawnMenu(Game game) {
         super(game);
+        respawnButton = addControl(new LabeledButton(this)
+            .withText("Respawn")
+            .at(-50, 0)
+            .size(100.0f, 20.0f)
+            .alignedAt(0.5f, 0.5f)
+        );
         saveQuitButton = addControl(new LabeledButton(this)
 				.withText("Save And Quit")
 				.at(-50, 32)
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 0.5f)
 		);
-        optionsButton = addControl(new LabeledButton(this)
-            .withText("Options")
-            .at(-50, 0)
-            .size(100.0f, 20.0f)
-            .alignedAt(0.5f, 0.5f)
-        );
-        returnButton = addControl(new LabeledButton(this)
-            .withText("Return to Game")
-            .at(-50, -32)
-            .size(100.0f, 20.0f)
-            .alignedAt(0.5f, 0.5f)
-        );
+
     }
 
     @Override
@@ -50,15 +44,14 @@ public class PauseMenu extends GuiScreen {
 			r.draw2D.drawQuad(Quad.shared()
 					.at(0, 0)
 					.size(r.screen.getWidth(), r.screen.getHeight())
-					.withColor(0.0f, 0.0f, 0.0f, 0.8f)
+					.withColor(100.0f, 0.0f, 0.0f, 0.8f)
 			);
 
-			String title = "Game Isn't Stopped Btw";
+			String title = "You Died (ur so trash)";
 			r.fonts.outlined.print(title, (r.screen.getWidth() - r.fonts.outlined.getStringLength(title)) / 2.0f, 20);
 		}
+        respawnButton.draw();
         saveQuitButton.draw();
-        returnButton.draw();
-        optionsButton.draw();
     }
 
     @Override
@@ -70,17 +63,16 @@ public class PauseMenu extends GuiScreen {
 
     @Override
 	public void onControlClicked(GuiControl control, int button) {
-		if (control == returnButton) {
+		if (control == respawnButton) {
             game.closeGui();
+            game.player.respawn();
         }
         if (control == saveQuitButton) {
             game.exitWorld();
             game.world = null;
             game.openGui(new MainMenu(game));
         }
-        if (control == optionsButton) {
-            game.openGui(new OptionsMenu(game));
-        }
+
 	}
     
 }

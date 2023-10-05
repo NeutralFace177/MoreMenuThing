@@ -64,6 +64,7 @@ public class Player extends Entity {
 			if (controller.doCrouch()) {
 				velY = -jumpHeight;
 			}
+
 		}
 
 		double yawRad = Math.toRadians(rotYaw);
@@ -138,6 +139,14 @@ public class Player extends Entity {
 
 	public double getRenderWalk() {
 		return world.scaleToTick(prevRenderWalk, renderWalk);
+	}
+
+	public void respawn() {
+		health = maxHealth;
+		posX = 0;
+		posY = 30;
+		posZ = 0;
+		alive = true;
 	}
 
 	public float getRenderWalkDir() {

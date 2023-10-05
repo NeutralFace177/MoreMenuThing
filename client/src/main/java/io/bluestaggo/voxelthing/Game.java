@@ -234,6 +234,9 @@ public class Game {
 		if (isInWorld()) {
 			player.onGameUpdate();
 			player.noClip = window.isKeyDown(GLFW_KEY_Q);
+			if (!player.alive) {
+				openGui(new RespawnMenu(instance));
+			}
 		}
 
 		if (tickTime >= TICK_RATE) {
