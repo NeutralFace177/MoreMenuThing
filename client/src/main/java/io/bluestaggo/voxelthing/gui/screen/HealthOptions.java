@@ -13,7 +13,7 @@ public class HealthOptions extends GuiScreen {
     public HealthOptions(Game game) {
         super(game);
         chatBox = (TextBox) addControl(new TextBox(this)
-         .at(-25.0f, 50.0f)
+         .at(75.0f, 50.0f)
          .size(50.0f, 20.0f)
          .alignedAt(0.5f, 0.0f)
         );
@@ -27,8 +27,10 @@ public class HealthOptions extends GuiScreen {
     @Override
 	public void draw() {
 		super.draw();
-        game.renderer.fonts.outlined.printRight("UNFINISHED, WONT WORK PROPERLY", 10,
-		10);
+        game.renderer.fonts.outlined.printRight("Min", chatBox.getScaledX() - 5.0f,
+				chatBox.getScaledY() + (chatBox.getScaledHeight() - game.renderer.fonts.outlined.lineHeight) / 2.0f);
+		game.renderer.fonts.outlined.printRight("Max", chatTextBox.getScaledX() - 5.0f,
+				chatTextBox.getScaledY() + (chatTextBox.getScaledHeight() - game.renderer.fonts.outlined.lineHeight) / 2.0f);
 	}
 
     @Override

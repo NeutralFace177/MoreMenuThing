@@ -47,6 +47,8 @@ public class IngameGui extends GuiScreen {
 		instance = this;
 		prevHoverProgress = new int[game.palette.length];
 		hoverProgress = new int[game.palette.length];
+		healthVisualMax = 6;
+		healthVisualMin = 1;
 	}
 
 	@Override
@@ -254,10 +256,7 @@ public class IngameGui extends GuiScreen {
 
 	private void drawHealthBar() {
 		MainRenderer r = game.renderer;
-
-		
 		int[] s = new int[]{7,9,11,13,15,17};
-		int[] g = new int[]{17+15+13+11+9+7, 17+15+13+11+9, 17+15+13+11,17+15+13,17+15,17};
 
 		float startX = (r.screen.getWidth() - 32 * game.palette.length) / 2.0f;
 		float startY = r.screen.getHeight() - 32 - 5;
@@ -268,28 +267,29 @@ public class IngameGui extends GuiScreen {
 		//undivide by 6
 		int v = value * k;
 		int a = value == 0 ? 1 : value;
-		float j = g[(h-v)];
-		float l = j + s[(h-v)];
 		int i = 0;
-		//System.out.println(k);
 		for (i = 0; i < a; i++) {
 			if (value != 0) {
-				r.draw2D.drawQuad(healthIcon(startX + i * s[healthVisualMax-1] + 57, startY - 10, s[healthVisualMax-1], new Vector4f(1f/512f, 1f/512f, 18f/512f, 18f/512f)));
+				r.draw2D.drawQuad(healthIcon(startX + i * s[healthVisualMax-1] + 57, startY - 10, healthVisualMax-1));
 			}
 			int m = value == 0 ? 0 : i+1;
 			if (i == a-1 && v != h) {
-				r.draw2D.drawQuad(healthIcon(startX + (m) * s[healthVisualMax-1] + 57, startY - 13 + s[(k-1)-(h-v-1)]/2, s[h-v-1],
-		 		 new Vector4f( (1f + (2 * (k-(h-v))) + j) / 512f, 1f/512f, (1f + (2 * (k-(h-v+1))) + l) / 512f, (1f + s[h-v-1]) / 512f)));;
+				r.draw2D.drawQuad(healthIcon(startX + (m) * s[healthVisualMax-1] + 57, startY - 13 + s[(k-1)-(h-v-1)]/2,h-v-1 + (healthVisualMin-1)));;
 			}
 		}
 	}
 
-	private Quad healthIcon(float sx, float sy, float size, Vector4f uv) {
+	private Quad healthIcon(float sx, float sy, int size) {
+		int[] s = new int[]{7,9,11,13,15,17};
+		int[] g = new int[]{17+15+13+11+9, 17+15+13+11, 17+15+13,17+15,17,0};
+
+		Vector4f uv = new Vector4f(g[size] / 512f, 0f/512f, (g[size] + s[size]) / 512f, (s[size]) / 512f);
+
 		Texture healthTexture = game.renderer.textures.getTexture("/assets/gui/icons.png");
-	//	System.out.println("x:" + uv.x*512 + " y:" + uv.y*512 + " z:" + uv.z*512 + " w:" + uv.w*512);
+		//System.out.println("x:" + uv.x*512 + " y:" + uv.y*512 + " z:" + uv.z*512 + " w:" + uv.w*512 + " size:" + size + " s[size]:" + s[size]);
 		return new Quad()
 			.at(sx, sy)
-			.size(size, size)
+			.size(s[size], s[size])
 			.withTexture(healthTexture)
 			.withUV(uv.x, uv.y, uv.z, uv.w);
 	}
