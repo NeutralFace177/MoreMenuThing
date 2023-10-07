@@ -2,6 +2,9 @@ package io.bluestaggo.voxelthing.world.entity;
 
 import io.bluestaggo.voxelthing.math.MathUtil;
 import io.bluestaggo.voxelthing.world.World;
+import io.bluestaggo.voxelthing.world.generation.WorldType;
+import io.bluestaggo.voxelthing.world.inventory.Hotbar;
+
 import org.joml.Vector2d;
 
 public class Player extends Entity {
@@ -25,11 +28,14 @@ public class Player extends Entity {
 	public double friction = 0.6;
 	public double jumpHeight = 0.5;
 
+	public Hotbar hotbar;
+
 	public boolean survival = true;
 
 	public Player(World world, IPlayerController controller) {
 		super(world);
 		this.controller = controller;
+		this.hotbar = new Hotbar();
 	}
 
 	public void setTexture(String texture) {

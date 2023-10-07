@@ -22,7 +22,9 @@ public class GenerationInfo {
 	private final long biomeSeed;
 	private final long secondBiomeSeed;
 	private final long treeSeed;
-	private final long treeSeed2;
+	private final long coalSeed;
+	private final long ironSeed;
+	private final long goldSeed;
 
 	public ArrayList<ArrayList<Double>> voronoiSeeds;
 	public ArrayList<ArrayList<Double>> unModVSeeds;
@@ -57,7 +59,9 @@ public class GenerationInfo {
 		biomeSeed = splitMix();
 		secondBiomeSeed = splitMix();
 		treeSeed = splitMix();
-		treeSeed2 = splitMix();
+		coalSeed = splitMix();
+		ironSeed = splitMix();
+		goldSeed = splitMix();
 
 		worldType = type;
 		waterLevel = worldType == WorldType.Normal ? 0 : 2;
@@ -302,5 +306,5 @@ public class GenerationInfo {
 				}
 			}
 		}
-	}
+	} 
 }

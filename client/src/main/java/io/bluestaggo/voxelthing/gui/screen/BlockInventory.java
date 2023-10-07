@@ -9,6 +9,10 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
+import io.bluestaggo.voxelthing.world.inventory.Hotbar;
+import io.bluestaggo.voxelthing.world.item.Item;
+import io.bluestaggo.voxelthing.world.item.ItemStack;
+
 import org.joml.Vector2i;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -18,6 +22,7 @@ public class BlockInventory extends GuiScreen {
 	private static final int ROWS = 5;
 	private static final int COLUMNS = 14;
 
+	private final GuiControl itemTab;
 	private final GuiControl blockTab;
 	private final GuiControl slabTab;
 
@@ -25,9 +30,15 @@ public class BlockInventory extends GuiScreen {
 
 	public BlockInventory(Game game) {
 		super(game);
+		itemTab = addControl(new LabeledButton(this)
+				.withText("Items")
+				.at(-70, 0)
+				.size(40.0f, 20.0f)
+				.alignedAt(0.5f, 0.125f)
+		);
 		blockTab = addControl(new LabeledButton(this)
 				.withText("Blocks")
-				.at(-70, 0)
+				.at(-20, 0)
 				.size(40.0f, 20.0f)
 				.alignedAt(0.5f, 0.125f)
 		);
@@ -60,6 +71,7 @@ public class BlockInventory extends GuiScreen {
 
 		Texture hotbarTexture = r.textures.getTexture("/assets/gui/hotbar.png");
 		Texture blocksTexture = r.textures.getTexture("/assets/blocks.png");
+		Texture itemsTexture = r.textures.getTexture("/assets/items.png");
 		int slotWidth = hotbarTexture.width / 2;
 		int slotHeight = hotbarTexture.height;
 		int blockOffX = (slotWidth - 16) / 2;
@@ -72,6 +84,9 @@ public class BlockInventory extends GuiScreen {
 		var blockQuad = new Quad()
 				.size(16, 16)
 				.withTexture(blocksTexture);
+		var itemQuad = new Quad()
+				.size(16, 16)
+				.withTexture(itemsTexture);
 
 		for (int y = 0; y < ROWS; y++) {
 			for (int x = 0; x < COLUMNS; x++) {
@@ -82,10 +97,10 @@ public class BlockInventory extends GuiScreen {
 
 				int i = x + y * COLUMNS;
 				if (tab == 1) {
-					if (i < Block.REGISTERED_BLOCKS_ORDERED.size() - Block.REGISTERED_SLABS_ORDERED.size()) {
-						Block block = Block.REGISTERED_BLOCKS_ORDERED.get(i);
-						if (block != null) {
-							Vector2i texture = block.getTexture().get(Direction.NORTH);
+					if (i < Item.REGISTERED_BLOCK_ITEMS_ORDERED.size() - Item.REGISTERED_SLAB_ITEMS_ORDERED.size()) {
+						Item item = Item.REGISTERED_BLOCK_ITEMS_ORDERED.get(i);
+						if (item != null) {
+							Vector2i texture = item.getTex().get();
 
 							float minU = blocksTexture.uCoord(texture.x * 16);
 							float minV = blocksTexture.vCoord(texture.y * 16);
@@ -98,11 +113,12 @@ public class BlockInventory extends GuiScreen {
 							);
 						}
 					}
-				} else {
-					if (i < Block.REGISTERED_SLABS_ORDERED.size()) {
-						Block block = Block.REGISTERED_SLABS_ORDERED.get(i);
-						if (block != null) {
-							Vector2i texture = block.getTexture().get(Direction.NORTH);
+				} 
+				if (tab == 2) {
+					if (i < Item.REGISTERED_SLAB_ITEMS_ORDERED.size()) {
+						Item item = Item.REGISTERED_SLAB_ITEMS_ORDERED.get(i);
+						if (item != null) {
+							Vector2i texture = item.getTex().get();
 
 							float minU = blocksTexture.uCoord(texture.x * 16);
 							float minV = blocksTexture.vCoord(texture.y * 16);
@@ -118,11 +134,30 @@ public class BlockInventory extends GuiScreen {
 						}
 					}
 				}
+				if (tab == 3) {
+					if (i < Item.REGISTERED_ITEMS_ONLY_ORDERED.size()) {
+						Item item = Item.REGISTERED_ITEMS_ONLY_ORDERED.get(i);
+						if (item != null) {
+							Vector2i texture = item.getTex().get();
+
+							float minU = blocksTexture.uCoord(texture.x * 16);
+							float minV = blocksTexture.vCoord(texture.y * 16);
+							float maxU = minU + blocksTexture.uCoord(16);
+							float maxV = minV + blocksTexture.vCoord(16);
+
+							r.draw2D.drawQuad(itemQuad
+									.at(slotX + blockOffX, slotY + blockOffY)
+									.withUV(minU, minV, maxU, maxV)
+							);
+						}
+					}
+				}
 
 			}
 		}
 		slabTab.draw();
 		blockTab.draw();
+		itemTab.draw();
 	}
 
 	@Override
@@ -139,7 +174,7 @@ public class BlockInventory extends GuiScreen {
 			newIndex = 9;
 		}
 
-		if (newIndex >= 0 && newIndex < game.palette.length) {
+		if (newIndex >= 0 && newIndex < Hotbar.COLUMNS) {
 			game.heldItem = newIndex;
 		}
 	}
@@ -151,6 +186,9 @@ public class BlockInventory extends GuiScreen {
 		}
 		if (control == slabTab) {
 			tab = 2;
+		}
+		if (control == itemTab) {
+			tab = 3;
 		}
 	}
 
@@ -174,15 +212,18 @@ public class BlockInventory extends GuiScreen {
 				if (mx > slotX + blockOffX && mx < slotX + slotWidth - blockOffX
 						&& my > slotY + blockOffY && my < slotY + slotHeight - blockOffY) {
 					int i = x + y * COLUMNS;
-					Block block = Block.STONE;
+					Item item = Item.STICK;
 					if (tab == 1) {
-						block = (i < Block.REGISTERED_BLOCKS_ORDERED.size() && tab == 1) ? Block.REGISTERED_BLOCKS_ORDERED.get(i) : null;
+						item = (i < Item.REGISTERED_BLOCK_ITEMS_ORDERED.size() && tab == 1) ? Item.REGISTERED_BLOCK_ITEMS_ORDERED.get(i) : null;
 					}
 					if (tab == 2) {
-						block = Block.REGISTERED_SLABS_ORDERED.get(i);
+						item = Item.REGISTERED_SLAB_ITEMS_ORDERED.get(i);
+					}
+					if (tab == 3) {
+						item = Item.REGISTERED_ITEMS_ONLY_ORDERED.get(i);	
 					}
 
-					game.palette[game.heldItem] = block;
+					game.player.hotbar.setItem(new ItemStack(item, 64), 0, game.heldItem);
 				}
 			}
 		}

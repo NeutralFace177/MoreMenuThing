@@ -81,7 +81,6 @@ public class Game {
 	public Player player;
 	public IPlayerController playerController;
 
-	public Block[] palette = new Block[9];
 	public int heldItem;
 
 	private final GuiScreen debugGui;
@@ -234,6 +233,7 @@ public class Game {
 		if (isInWorld()) {
 			player.onGameUpdate();
 			player.noClip = window.isKeyDown(GLFW_KEY_Q);
+			player.hotbar.tick();
 			if (!player.alive) {
 				openGui(new RespawnMenu(instance));
 			}

@@ -10,6 +10,9 @@ import io.bluestaggo.voxelthing.world.BlockRaycast;
 import io.bluestaggo.voxelthing.world.Direction;
 import io.bluestaggo.voxelthing.world.block.Block;
 import io.bluestaggo.voxelthing.world.generation.blockInStructure;
+import io.bluestaggo.voxelthing.world.inventory.Hotbar;
+import io.bluestaggo.voxelthing.world.item.Item;
+import io.bluestaggo.voxelthing.world.item.ItemStack;
 import io.bluestaggo.voxelthing.world.generation.Structures;
 
 import org.joml.Vector2i;
@@ -19,6 +22,7 @@ import org.lwjgl.system.Struct;
 import static org.lwjgl.glfw.GLFW.*;
 
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,8 +49,8 @@ public class IngameGui extends GuiScreen {
 	public IngameGui(Game game) {
 		super(game);
 		instance = this;
-		prevHoverProgress = new int[game.palette.length];
-		hoverProgress = new int[game.palette.length];
+		prevHoverProgress = new int[Hotbar.COLUMNS];
+		hoverProgress = new int[Hotbar.COLUMNS];
 		healthVisualMax = 6;
 		healthVisualMin = 1;
 	}
@@ -61,7 +65,7 @@ public class IngameGui extends GuiScreen {
 			newIndex = 9;
 		}
 
-		if (newIndex >= 0 && newIndex < game.palette.length) {
+		if (newIndex >= 0 && newIndex < Hotbar.COLUMNS) {
 			game.heldItem = newIndex;
 		}
 	}
@@ -73,7 +77,7 @@ public class IngameGui extends GuiScreen {
 	@Override
 	public void tick() {
 		BlockRaycast raycast = game.getBlockRaycast();
-		for (int i = 0; i < game.palette.length; i++) {
+		for (int i = 0; i < Hotbar.COLUMNS; i++) {
 			int hover = hoverProgress[i];
 			prevHoverProgress[i] = hover;
 
@@ -109,7 +113,7 @@ public class IngameGui extends GuiScreen {
 		}
 		if (miningTick == 0) {
 			if (raycast.blockHit()) {
-				game.palette[game.heldItem] = game.world.getBlock(x, y, z);
+				game.player.hotbar.onPickUp(new ItemStack(Item.blockToItem(game.world.getBlock(x, y, z)), 1)); 
 				game.world.setBlock(x, y, z, null);
 				miningTick = maxMiningTick;
 			}
@@ -143,10 +147,16 @@ public class IngameGui extends GuiScreen {
 
 	private void drawHand() {
 		MainRenderer r = game.renderer;
+		Item item = null;
+		try {
+			item = game.player.hotbar.getItem(0, game.heldItem).getItem();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 
-		Block block = getPlacedBlock();
 		Texture playerTexture = r.textures.getTexture(game.player.getTexture());
 		Texture blocksTexture = r.textures.getTexture("/assets/blocks.png");
+		Texture itemsTexture = r.textures.getTexture("/assets/items.png");
 
 		float handSize = r.screen.getHeight();
 		float hover = MathUtil.lerp(prevHoverProgress[game.heldItem], hoverProgress[game.heldItem], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
@@ -155,7 +165,7 @@ public class IngameGui extends GuiScreen {
 		swing *= swing;
 
 		float bobX = (float) (MathUtil.sinPi(swing) / -3.0) * handSize;
-		float bobY = (float) ((1.0 - hover * (block == null ? 1.0 : 0.9))
+		float bobY = (float) ((1.0 - hover * (item == null ? 1.0 : 0.9))
 				+ (MathUtil.sinPi(swing * 2.0) / 6.0)) * handSize;
 
 		if (game.viewBobbingEnabled()) {
@@ -171,9 +181,8 @@ public class IngameGui extends GuiScreen {
 				.withTexture(playerTexture)
 				.withUV(1.0f - playerTexture.uCoord(32), 1.0f - playerTexture.vCoord(32), 1.0f, 1.0f));
 
-		if (block != null) {
-			Vector2i texture = block.getTexture().get(Direction.NORTH);
-
+		if (item != null) {
+			Vector2i texture = item.getTex().get();
 			float minU = blocksTexture.uCoord(texture.x * 16);
 			float minV = blocksTexture.vCoord(texture.y * 16);
 			float maxU = minU + blocksTexture.uCoord(16);
@@ -184,12 +193,22 @@ public class IngameGui extends GuiScreen {
 					.size(handSize * 0.35f, handSize * 0.4f)
 					.withTexture(blocksTexture)
 					.withUV(minU, minV, maxU, maxV);
-
-			r.draw2D.drawQuad(blockQuad);
-			r.draw2D.drawQuad(blockQuad
-					.size(handSize * 0.15f, handSize * 0.4f)
-					.offset(handSize * 0.35f, 0.0f)
-					.withColor(0.75f, 0.75f, 0.75f));
+			Quad itemQuad = Quad.shared()
+					.at(r.screen.getWidth() + (bobX - handSize / 1.8f) + 10.0f, r.screen.getHeight() + (bobY - handSize / 1.8f))
+					.size(handSize * 0.4f, handSize * 0.4f)
+					.withTexture(itemsTexture)
+					.withUV(minU, minV, maxU, maxV);
+			
+			if (item.blockItem) {
+				r.draw2D.drawQuad(blockQuad);
+				r.draw2D.drawQuad(blockQuad
+						.size(handSize * 0.15f, handSize * 0.4f)
+						.offset(handSize * 0.35f, 0.0f)
+						.withColor(0.75f, 0.75f, 0.75f));
+			} else {
+				r.draw2D.drawQuad(itemQuad);
+			}
+			
 		}
 	}
 
@@ -198,10 +217,11 @@ public class IngameGui extends GuiScreen {
 
 		Texture hotbarTexture = r.textures.getTexture("/assets/gui/hotbar.png");
 		Texture blocksTexture = r.textures.getTexture("/assets/blocks.png");
+		Texture itemTexture = r.textures.getTexture("/assets/items.png");
 		int slotWidth = hotbarTexture.width / 2;
 		int slotHeight = hotbarTexture.height;
 
-		float startX = (r.screen.getWidth() - slotWidth * game.palette.length) / 2.0f;
+		float startX = (r.screen.getWidth() - slotWidth * Hotbar.COLUMNS) / 2.0f;
 		float startY = r.screen.getHeight() - slotHeight - 5;
 
 		var hotbarQuad = new Quad()
@@ -217,9 +237,16 @@ public class IngameGui extends GuiScreen {
 				.at(startX + (slotWidth - 16) / 2.0f, startY + slotHeight / 2.0f)
 				.size(16, 8)
 				.withTexture(blocksTexture);
-
-		for (int i = 0; i < game.palette.length; i++) {
-			Block block = game.palette[i];
+		var itemQuad = new Quad()
+			.at(startX + (slotHeight-16) / 2.0f, startY + (slotHeight - 16) / 2.0f)
+			.size(16,16)
+			.withTexture(itemTexture);
+		for (int i = 0; i < Hotbar.COLUMNS; i++) {
+			ItemStack itemStack = game.player.hotbar.getItem(0, i);
+			Item item = Item.STICK;
+			if (itemStack != null) {
+				item = itemStack.getItem();
+			}
 
 			float hover = MathUtil.lerp(prevHoverProgress[i], hoverProgress[i], (float) game.getPartialTick()) / (Game.TICKS_PER_SECOND / 4.0f);
 			hover = MathUtil.squareOut(hover);
@@ -228,13 +255,14 @@ public class IngameGui extends GuiScreen {
 			hotbarQuad.offset(0, -hover);
 			blockQuad.offset(0, -hover);
 			halfQuad.offset(0, -hover);
+			itemQuad.offset(0, -hover);
 
 			float slotOffset = i == game.heldItem ? 0.5f : 0.0f;
 			r.draw2D.drawQuad(hotbarQuad.withUV(slotOffset, 0.0f, 0.5f + slotOffset, 1.0f));
 
-			if (block != null) {
-				Vector2i texture = block.getTexture().get(Direction.NORTH);
-				boolean slab = Block.REGISTERED_SLABS_ORDERED.contains(block);
+			if (itemStack != null) {
+				Vector2i texture = item.getTex().get();
+				boolean slab = Block.REGISTERED_SLABS_ORDERED.contains(Item.itemToBlock(item));
 
 				float minU = blocksTexture.uCoord(texture.x * 16);
 				float minV = blocksTexture.vCoord(texture.y * 16);
@@ -243,14 +271,17 @@ public class IngameGui extends GuiScreen {
 
 				if (slab) {
 					r.draw2D.drawQuad(halfQuad.withUV(minU, minV, maxU, maxV));
-				} else {
+				} else if (item.blockItem) {
 					r.draw2D.drawQuad(blockQuad.withUV(minU, minV, maxU, maxV));
+				} else {
+					r.draw2D.drawQuad(itemQuad.withUV(minU, minV, maxU, maxV));
 				}
-
+				r.fonts.outlined.printRight(String.valueOf(itemStack.getCount()), startX + (slotHeight-16) / 2.0f + slotWidth * i + 16, startY + (slotHeight - 16) / 2.0f -hover+10, 1.0f, 1.0f, 1.0f, 0.75f);
 			}
 
 			hotbarQuad.offset(slotWidth, hover);
 			blockQuad.offset(slotWidth, hover);
+			itemQuad.offset(slotWidth, hover);
 		}
 	}
 
@@ -258,7 +289,7 @@ public class IngameGui extends GuiScreen {
 		MainRenderer r = game.renderer;
 		int[] s = new int[]{7,9,11,13,15,17};
 
-		float startX = (r.screen.getWidth() - 32 * game.palette.length) / 2.0f;
+		float startX = (r.screen.getWidth() - 32 * Hotbar.COLUMNS) / 2.0f;
 		float startY = r.screen.getHeight() - 32 - 5;
 		int h = game.player.health;
 		//health divided by 6 floored
@@ -295,10 +326,17 @@ public class IngameGui extends GuiScreen {
 	}
 
 	private Block getPlacedBlock() {
-		if (game.heldItem < 0 || game.heldItem >= game.palette.length) {
+		if (game.heldItem < 0 || game.heldItem >= Hotbar.COLUMNS) {
 			return null;
 		}
-		return game.palette[game.heldItem];
+		ItemStack itemStack = game.player.hotbar.getItem(0, game.heldItem);
+		Block block;
+		if (itemStack != null) {
+			block = Item.itemToBlock(game.player.hotbar.getItem(0, game.heldItem).getItem());
+		} else {
+			block = null;
+		}
+		return block; 
 	}
 
 	
@@ -405,7 +443,9 @@ public class IngameGui extends GuiScreen {
 							a += "}";
 							System.out.println("\n" + a);
 						}
-						
+						if (game.player.survival) {
+							game.player.hotbar.changeCount(0, game.heldItem, -1);
+						}
 						swingTick = 10;
 					}
 				}
