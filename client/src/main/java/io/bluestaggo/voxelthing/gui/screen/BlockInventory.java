@@ -15,8 +15,8 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 public class BlockInventory extends GuiScreen {
-	private static final int ROWS = 10;
-	private static final int COLUMNS = 5;
+	private static final int ROWS = 5;
+	private static final int COLUMNS = 14;
 
 	private final GuiControl blockTab;
 	private final GuiControl slabTab;
@@ -73,14 +73,14 @@ public class BlockInventory extends GuiScreen {
 				.size(16, 16)
 				.withTexture(blocksTexture);
 
-		for (int y = 0; y < COLUMNS; y++) {
-			for (int x = 0; x < ROWS; x++) {
-				float slotX = (r.screen.getWidth() - slotWidth * ROWS) / 2.0f + x * slotWidth;
-				float slotY = (r.screen.getHeight() - slotHeight * COLUMNS) / 2.0f + y * slotHeight;
+		for (int y = 0; y < ROWS; y++) {
+			for (int x = 0; x < COLUMNS; x++) {
+				float slotX = (r.screen.getWidth() - slotWidth * COLUMNS) / 2.0f + x * slotWidth;
+				float slotY = (r.screen.getHeight() - slotHeight * ROWS) / 2.0f + y * slotHeight;
 
 				r.draw2D.drawQuad(hotbarQuad.at(slotX, slotY));
 
-				int i = x + y * ROWS;
+				int i = x + y * COLUMNS;
 				if (tab == 1) {
 					if (i < Block.REGISTERED_BLOCKS_ORDERED.size() - Block.REGISTERED_SLABS_ORDERED.size()) {
 						Block block = Block.REGISTERED_BLOCKS_ORDERED.get(i);
@@ -166,14 +166,14 @@ public class BlockInventory extends GuiScreen {
 		int blockOffX = (slotWidth - 16) / 2;
 		int blockOffY = (slotHeight - 16) / 2;
 
-		for (int y = 0; y < COLUMNS; y++) {
-			for (int x = 0; x < ROWS; x++) {
-				int slotX = (r.screen.getWidth() - slotWidth * ROWS) / 2 + x * slotWidth;
-				int slotY = (r.screen.getHeight() - slotHeight * COLUMNS) / 2 + y * slotHeight;
+		for (int y = 0; y < ROWS; y++) {
+			for (int x = 0; x < COLUMNS; x++) {
+				int slotX = (r.screen.getWidth() - slotWidth * COLUMNS) / 2 + x * slotWidth;
+				int slotY = (r.screen.getHeight() - slotHeight * ROWS) / 2 + y * slotHeight;
 
 				if (mx > slotX + blockOffX && mx < slotX + slotWidth - blockOffX
 						&& my > slotY + blockOffY && my < slotY + slotHeight - blockOffY) {
-					int i = x + y * ROWS;
+					int i = x + y * COLUMNS;
 					Block block = Block.STONE;
 					if (tab == 1) {
 						block = (i < Block.REGISTERED_BLOCKS_ORDERED.size() && tab == 1) ? Block.REGISTERED_BLOCKS_ORDERED.get(i) : null;

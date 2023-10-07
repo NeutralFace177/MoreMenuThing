@@ -6,6 +6,7 @@ public enum BlockType {
     Normal(new Vector3f(1, 1, 1)),
  // not implemented   Stair(new Vector3f(1, 1, 1)),
     slab(new Vector3f(1, 0.5f, 1)),
+    liquid(new Vector3f(1, 0.85f, 1)),
     verticalSlab(new Vector3f(0.5f, 1, 0.5f));
  // nit implemented   plant;
 

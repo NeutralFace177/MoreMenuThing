@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 public class BlockRenderer {
 	private static final float SHADE_FACTOR = 0.15f;
 	private static float xOffSet = 1;
-	private static float yOffSet = 1.25f;
+	private static float yOffSet = 1;
 	private static float zOffSet = 1;
 	private final SideRenderer[] SIDE_RENDERERS = {
 			this::renderNorthFace,
@@ -40,10 +40,18 @@ public class BlockRenderer {
 		if (block == null) {
 			return false;
 		}
+
+		if (block == Block.WATER && chunk.getBlock(x, y+1, z) == Block.WATER) {
+			xOffSet = 1;
+			yOffSet = 1;
+			zOffSet = 1;
+		} else {
+			xOffSet = block.type.shape().x;
+			yOffSet = block.type.shape().y;
+			zOffSet = block.type.shape().z;
+		}
 		
-		xOffSet = block.type.shape().x;
-		yOffSet = block.type.shape().y;
-		zOffSet = block.type.shape().z;
+
 
 		int xx = x + Chunk.LENGTH * chunk.x;
 		int yy = y + Chunk.LENGTH * chunk.y;

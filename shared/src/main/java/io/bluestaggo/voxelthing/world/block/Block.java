@@ -8,6 +8,7 @@ import io.bluestaggo.voxelthing.world.block.texture.AllSidesTexture;
 import io.bluestaggo.voxelthing.world.block.texture.BlockTexture;
 import io.bluestaggo.voxelthing.world.block.texture.ColumnTexture;
 import io.bluestaggo.voxelthing.world.block.texture.GrassTexture;
+import io.bluestaggo.voxelthing.world.block.texture.SideTopBottomTexture;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -33,21 +34,35 @@ public class Block {
 	public float hardness = 5;
 
 	public static final String[] WOOL_NAMES = {
+			"red",
+			"blood_orange",
+			"orange",
+			"light_orange",
+			"yellow",
+			"lime",
+			"green",
+			"blueish-green",
+			"turquoise",
+			"blue",
+			"indigo",
+			"violet",
+			"purple",
+			"light_purple",
+			"dark_pink",
+			"magaenta",
+			"pink",
+			"dark_green",
+			"brown",
+			"dark_blue",
+			"blue-2",
+			"blue-3",
+			"blue-4",
+			"cyan",
 			"black",
+			"black_gray",
 			"dark_gray",
 			"gray",
 			"light_gray",
-			"yellow",
-			"orange",
-			"green",
-			"teal",
-			"turquoise",
-			"cyan",
-			"blue",
-			"navy",
-			"red",
-			"purple",
-			"brown",
 			"white"
 	};
 
@@ -55,20 +70,42 @@ public class Block {
 	public static final Block STONE = new Block("stone", 10).withTex(1, 0);
 	public static final Block GRASS = new Block("grass", 2.5f).withTex(new GrassTexture(0, 1, 0, 0, 0, 2));
 	public static final Block DIRT = new Block("dirt", 2).withTex(0, 2);
-	public static final Block COBBLESTONE = new Block("cobblestone", 8).withTex(1, 1);
-	public static final Block BRICKS = new Block("bricks", 8.75f).withTex(3, 2);
-	public static final Block PLANKS = new Block("planks", 4).withTex(3, 0);
-	public static final Block LOG = new Block("log", 4.25f).withTex(new ColumnTexture(3, 1, 4, 1));
-	public static final Block LEAVES = new Block("leaves", 1.5f).withTex(4, 0).transparency(BlockTransparency.THICK);
-	public static final Block GLASS = new Block("glass", 1.5f).withTex(4, 2).transparency(BlockTransparency.FULL);
+	public static final Block BEDROCK = new Block("bedrock").withTex(1,1);
+	public static final Block COBBLESTONE = new Block("cobblestone", 8).withTex(1, 2);
+	public static final Block MOSSY_COBBLESTONE = new Block("mossy_cobblestone", 8).withTex(2, 2);
+	public static final Block BRICKS = new Block("bricks", 8.75f).withTex(4, 3);
+	public static final Block COBBLE_BRICKS = new Block("cobble_bricks", 8.75f).withTex(5,3);
+	public static final Block PLANKS = new Block("planks", 4).withTex(5, 0);
+	public static final Block TILED_WOOD = new Block("tiled_wood", 4.25f).withTex(5,2);
+	public static final Block BOOKSHELF = new Block("bookshelf", 4.25f).withTex(new ColumnTexture(6, 2, 5, 0));
+	public static final Block LOG = new Block("log", 4.25f).withTex(new ColumnTexture(5, 1, 6, 1));
+	public static final Block CRATE = new Block("crate", 22/5).withTex(6,5);
+	public static final Block LEAVES = new Block("leaves", 1.5f).withTex(6, 0).transparency(BlockTransparency.THICK);
+	public static final Block GLASS = new Block("glass", 1.5f).withTex(3, 1).transparency(BlockTransparency.FULL);
 	public static final Block SAND = new Block("sand", 2).withTex(2, 0);
+	public static final Block SANDSTONE  = new Block("sandstone", 4.5f).withTex(new SideTopBottomTexture(4, 1, 4, 0, 4, 2));
 	public static final Block GRAVEL = new Block("gravel", 2).withTex(2, 1);
-	public static final Block STONE_BRICKS = new Block("stone_bricks", 8).withTex(2, 2);
-	public static final Block POLISHED_STONE = new Block("polished_stone", 10).withTex(1, 2);
-	public static final Block WATER = new Block("water", 2/5).withTex(4,3).transparency(BlockTransparency.FULL);
-	public static final Block SNOW = new Block("snow", 2).withTex(4,4);
+	public static final Block MUD = new Block("mud", 1.5f).withTex(3,0);
+	public static final Block STONE_BRICKS = new Block("stone_bricks", 9).withTex(7, 1);
+	public static final Block POLISHED_STONE = new Block("polished_stone", 9).withTex(7, 0);
+	public static final Block TILED_STONE = new Block("tiled_stone", 9).withTex(7,2);
+	public static final Block STONE_PILLAR = new Block("stone_pillar", 9).withTex(new SideTopBottomTexture(8, 1, 8, 0, 8, 2));
+	public static final Block WATER = new Block("water", 2/5, BlockType.liquid).withTex(6,4).transparency(BlockTransparency.FULL);
+	public static final Block SNOW = new Block("snow", 2).withTex(5,5);
+	public static final Block ICE = new Block("ice", 1.25f).withTex(8, 4);
+	public static final Block PACKED_ICE = new Block("packed_ice", 1.75f).withTex(7,4);
+	public static final Block LAVA = new Block("lava", 2/5, BlockType.liquid).withTex(5,4);
+	public static final Block MAGMA = new Block("magma", 30).withTex(3,2);
+	public static final Block OBSIDIAN = new Block("obsidian", 40).withTex(3, 3);
+	public static final Block GOLD_ORE = new Block("gold_ore", 10).withTex(0, 3);
+	public static final Block IRON_ORE = new Block("iron_ore", 10).withTex(1,3);
+	public static final Block COAL_ORE = new  Block("coal_ore",10).withTex(2,3);
+	public static final Block IRON_BLOCK = new Block("iron_block", 20).withTex(new SideTopBottomTexture(9, 1, 9, 0, 9, 2));
+	public static final Block GOLD_BLOCk = new Block("gold_block", 20).withTex(new SideTopBottomTexture(10, 1, 10, 0, 10, 2));
+	public static final Block UNKNOWN = new Block("unknown", 200).withTex(new SideTopBottomTexture(11, 1, 11, 0, 11, 2));
+	public static final Block TNT = new Block("tnt", 3.5f).withTex(new SideTopBottomTexture(6, 3, 7, 3, 8, 3));
 	public static final Block[] WOOL = IntStream.range(0, WOOL_NAMES.length)
-			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i], 3).withTex(i % 4, i / 4 + 3))
+			.mapToObj(i -> new Block("wool_" + WOOL_NAMES[i], 3).withTex(i % 5, i / 5 + 4))
 			.toArray(Block[]::new);
 	public static final Block[] SLABS = IntStream.range(0, REGISTERED_BLOCKS_ORDERED_MUTABLE.size())
 			.mapToObj(i -> new Block(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).getId().name + "_slab",BlockType.slab, new String[]{"Bottom"}, REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).hardness).withTex(REGISTERED_BLOCKS_ORDERED_MUTABLE.get(i).texture))
@@ -88,6 +125,10 @@ public class Block {
 
 	public Block(String id, float hardness) {
 		this(new Identifier(id), BlockType.Normal, new String[]{}, hardness);
+	}
+
+	public Block(String id, float hardness, BlockType type) {
+		this(new Identifier(id), type, new String[]{}, hardness);
 	}
 
 	public Block(String id, BlockType type, String[] states) {
@@ -185,6 +226,9 @@ public class Block {
 		Block block = blockAccess.getBlock(x, y, z);
 		try {
 			if (block.type == BlockType.slab && ogBlock.type == BlockType.slab && (face == Direction.BOTTOM || face == Direction.TOP)) {
+				return true;
+			}
+			if (block == WATER && blockAccess.getBlock(x,y+1,z) == null) {
 				return true;
 			}
 		} catch (NullPointerException e) {
