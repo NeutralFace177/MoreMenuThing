@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class SaveSelect extends GuiScreen {
 	private final GuiControl newWorldButton;
@@ -86,6 +87,13 @@ public class SaveSelect extends GuiScreen {
 
 		super.draw();
 	}
+
+	@Override 
+    protected void onKeyPressed(int key) {
+        if (key == GLFW_KEY_ESCAPE) {
+            game.openGui(parent);
+        }
+    }
 
 	@Override
 	public void onControlClicked(GuiControl control, int button) {

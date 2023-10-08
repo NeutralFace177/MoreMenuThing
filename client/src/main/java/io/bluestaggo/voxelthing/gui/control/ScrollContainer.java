@@ -6,8 +6,8 @@ import io.bluestaggo.voxelthing.renderer.MainRenderer;
 import io.bluestaggo.voxelthing.renderer.draw.Quad;
 
 public class ScrollContainer extends GuiContainer {
-	private float contentHeight;
-	private float scrollAmount;
+	public float contentHeight;
+	public float scrollAmount;
 
 	public ScrollContainer(GuiScreen screen) {
 		super(screen);

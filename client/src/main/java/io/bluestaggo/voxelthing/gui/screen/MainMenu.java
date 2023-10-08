@@ -22,6 +22,7 @@ public class MainMenu extends GuiScreen {
 	private final String splash;
 
 	private final GuiControl playButton;
+	private final GuiControl infoButton;
 
 	static {
 		List<String> splashes = List.of("No splashes?");
@@ -49,6 +50,11 @@ public class MainMenu extends GuiScreen {
 				.at(-50.0f, 0.0f)
 				.size(100.0f, 20.0f)
 				.alignedAt(0.5f, 0.5f)
+		);
+		infoButton = addControl(new LabeledButton(this)
+				.withText("i")
+				.size(11.0f, 11.0f)
+				.alignedAt(0.9f, 0.9f)
 		);
 	}
 
@@ -84,6 +90,9 @@ public class MainMenu extends GuiScreen {
 	public void onControlClicked(GuiControl control, int button) {
 		if (control == playButton) {
 			game.openGui(new SaveSelect(game));
+		}
+		if (control == infoButton) {
+			game.openGui(new InfoScreen(game));
 		}
 	}
 }

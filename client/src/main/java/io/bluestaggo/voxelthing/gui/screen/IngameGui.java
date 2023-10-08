@@ -176,7 +176,7 @@ public class IngameGui extends GuiScreen {
 
 		r.draw2D.drawQuad(Quad.shared()
 				.at(r.screen.getWidth() - handSize + bobX,
-						r.screen.getHeight() - handSize + bobY + handSize / 4.0f)
+				r.screen.getHeight() - handSize + bobY + handSize / 4.0f)
 				.size(handSize, handSize)
 				.withTexture(playerTexture)
 				.withUV(1.0f - playerTexture.uCoord(32), 1.0f - playerTexture.vCoord(32), 1.0f, 1.0f));
@@ -200,11 +200,12 @@ public class IngameGui extends GuiScreen {
 					.withUV(minU, minV, maxU, maxV);
 			
 			if (item.blockItem) {
-				r.draw2D.drawQuad(blockQuad);
+				r.draw2D.drawQuad(blockQuad.withTexture(blocksTexture));
 				r.draw2D.drawQuad(blockQuad
 						.size(handSize * 0.15f, handSize * 0.4f)
 						.offset(handSize * 0.35f, 0.0f)
-						.withColor(0.75f, 0.75f, 0.75f));
+						.withColor(0.75f, 0.75f, 0.75f)
+						.withTexture(blocksTexture));
 			} else {
 				r.draw2D.drawQuad(itemQuad);
 			}
